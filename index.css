@@ -1,0 +1,1628 @@
+/* ==========================================================
+   88_AN0THER_G4ME
+   INDEX.CSS
+   ========================================================== */
+
+
+/* ==========================================================
+   VARIABLES
+   ========================================================== */
+
+:root {
+
+    --background: #05080c;
+
+    --panel: #0a1017;
+
+    --panel-light: #0f1821;
+
+    --border: #263743;
+
+    --border-light: #334a58;
+
+    --cyan: #00e5ff;
+
+    --green: #00ff99;
+
+    --orange: #ff9d00;
+
+    --red: #ff4057;
+
+    --violet: #b56cff;
+
+    --blue: #3d8bff;
+
+    --yellow: #ffe600;
+
+    --pink: #ff5fcf;
+
+    --text: #dce7ec;
+
+    --muted: #657783;
+
+    --tile-size: 58px;
+
+    --menu-trigger: 8px;
+
+    --board-size: 760px;
+
+}
+
+
+/* ==========================================================
+   RESET
+   ========================================================== */
+
+* {
+
+    box-sizing: border-box;
+
+}
+
+
+html,
+body {
+
+    width: 100%;
+
+    height: 100%;
+
+    margin: 0;
+
+}
+
+
+body {
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #101c26 0%,
+            #080e14 45%,
+            var(--background) 82%
+        );
+
+    color: var(--text);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+}
+
+
+/* ==========================================================
+   ZONE DE JEU
+   ========================================================== */
+
+.game {
+
+    position: relative;
+
+    width: 100vw;
+
+    height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+
+.game-header {
+
+    position: absolute;
+
+    top: 75px;
+
+    left: 50%;
+
+    width: min(
+        900px,
+        70vw
+    );
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
+
+}
+
+
+.sector {
+
+    color: var(--cyan);
+
+    font-size: 9px;
+
+    letter-spacing: 0.3em;
+
+}
+
+
+h1 {
+
+    margin: 5px 0 0;
+
+    font-size: 28px;
+
+    font-weight: normal;
+
+    letter-spacing: 0.15em;
+
+}
+
+
+h1 span {
+
+    color: var(--cyan);
+
+}
+
+
+.coordinates {
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    letter-spacing: 0.15em;
+
+}
+
+
+/* ==========================================================
+   CONTENEUR DU PLATEAU
+   ========================================================== */
+
+.board-container {
+
+    position: relative;
+
+    width: 80vw;
+
+    height: 72vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+}
+
+
+/* ==========================================================
+   PLATEAU CIRCULAIRE
+   ========================================================== */
+
+.board {
+
+    position: relative;
+
+    width: var(--board-size);
+
+    height: var(--board-size);
+
+    max-width: 72vh;
+
+    max-height: 72vh;
+
+    min-width: 500px;
+
+    min-height: 500px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #101c24 0%,
+            #0b131a 45%,
+            #071016 75%,
+            #050a0f 100%
+        );
+
+    border:
+        1px solid
+        #263943;
+
+    box-shadow:
+        0 0 40px
+        rgba(
+            0,
+            0,
+            0,
+            0.8
+        ),
+        inset 0 0 50px
+        rgba(
+            0,
+            229,
+            255,
+            0.04
+        );
+
+}
+
+
+/* ==========================================================
+   AXES DES 8 SECTEURS
+   ========================================================== */
+
+.board::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    background:
+        repeating-conic-gradient(
+            from -22.5deg,
+            rgba(
+                0,
+                229,
+                255,
+                0.14
+            )
+            0deg 1px,
+            transparent 1px 45deg
+        );
+
+    pointer-events: none;
+
+    z-index: 1;
+
+}
+
+
+/* ==========================================================
+   CERCLES DES RINGS
+   ========================================================== */
+
+.board::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 72px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(
+            0,
+            229,
+            255,
+            0.07
+        );
+
+    box-shadow:
+        0 0 0 64px
+        rgba(
+            0,
+            229,
+            255,
+            0.018
+        ),
+        0 0 0 128px
+        rgba(
+            0,
+            229,
+            255,
+            0.018
+        ),
+        0 0 0 192px
+        rgba(
+            0,
+            229,
+            255,
+            0.018
+        );
+
+    pointer-events: none;
+
+    z-index: 1;
+
+}
+
+
+/* ==========================================================
+   SECTEUR
+   ========================================================== */
+
+.sector-layer {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 5;
+
+    pointer-events: none;
+
+}
+
+
+/* ==========================================================
+   LABEL JOUEUR
+   ========================================================== */
+
+.sector-label {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 115px;
+
+    margin-top: -350px;
+
+    transform:
+        translateX(-50%);
+
+    text-align: center;
+
+    color:
+        rgba(
+            220,
+            231,
+            236,
+            0.35
+        );
+
+    font-size: 8px;
+
+    letter-spacing:
+        0.18em;
+
+    pointer-events: none;
+
+}
+
+
+/* ==========================================================
+   CASE OCTOGONALE
+   ========================================================== */
+
+.tile {
+
+    position: absolute;
+
+    top: 50%;
+
+    left: 50%;
+
+    width: var(--tile-size);
+
+    height: var(--tile-size);
+
+    margin:
+        calc(
+            var(--tile-size) / -2
+        );
+
+    background:
+        var(--border);
+
+    clip-path:
+        polygon(
+            29% 0%,
+            71% 0%,
+            100% 29%,
+            100% 71%,
+            71% 100%,
+            29% 100%,
+            0% 71%,
+            0% 29%
+        );
+
+    transform:
+        rotate(var(--angle))
+        translateY(
+            calc(
+                var(--radius) * -1
+            )
+        );
+
+    transform-origin:
+        center center;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    transition:
+        transform 0.12s ease,
+        background 0.12s ease,
+        filter 0.12s ease;
+
+}
+
+
+/* ==========================================================
+   INTÉRIEUR
+   ========================================================== */
+
+.tile::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 2px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0d161e,
+            #091017
+        );
+
+    clip-path: inherit;
+
+}
+
+
+/* ==========================================================
+   CONTOUR
+   ========================================================== */
+
+.tile::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 6px;
+
+    border:
+        1px solid
+        rgba(
+            0,
+            229,
+            255,
+            0.08
+        );
+
+    clip-path: inherit;
+
+}
+
+
+/* ==========================================================
+   COULEURS DES 8 TERRAINS
+   ========================================================== */
+
+.player-1 {
+
+    --player-color:
+        var(--cyan);
+
+}
+
+
+.player-2 {
+
+    --player-color:
+        var(--green);
+
+}
+
+
+.player-3 {
+
+    --player-color:
+        var(--orange);
+
+}
+
+
+.player-4 {
+
+    --player-color:
+        var(--red);
+
+}
+
+
+.player-5 {
+
+    --player-color:
+        var(--violet);
+
+}
+
+
+.player-6 {
+
+    --player-color:
+        var(--blue);
+
+}
+
+
+.player-7 {
+
+    --player-color:
+        var(--yellow);
+
+}
+
+
+.player-8 {
+
+    --player-color:
+        var(--pink);
+
+}
+
+
+/* ==========================================================
+   HOVER
+   ========================================================== */
+
+.tile:hover {
+
+    transform:
+        rotate(var(--angle))
+        translateY(
+            calc(
+                var(--radius) * -1
+            )
+        )
+        scale(1.08);
+
+    background:
+        var(--player-color);
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            var(--player-color)
+        );
+
+    z-index: 50;
+
+}
+
+
+.tile:hover::before {
+
+    background:
+        #10242e;
+
+}
+
+
+/* ==========================================================
+   CASE SÉLECTIONNÉE
+   ========================================================== */
+
+.tile.selected {
+
+    background:
+        var(--green);
+
+    filter:
+        drop-shadow(
+            0 0 12px
+            var(--green)
+        );
+
+    z-index: 60;
+
+}
+
+
+.tile.selected::before {
+
+    background:
+        #10281e;
+
+}
+
+
+/* ==========================================================
+   CENTRE
+   ========================================================== */
+
+.center-tile {
+
+    --radius: 0px;
+
+    --angle: 0deg;
+
+    background:
+        var(--cyan);
+
+    filter:
+        drop-shadow(
+            0 0 18px
+            rgba(
+                0,
+                229,
+                255,
+                0.65
+            )
+        );
+
+    z-index: 20;
+
+}
+
+
+.center-tile::before {
+
+    background:
+        radial-gradient(
+            circle,
+            #12313b,
+            #09202a
+        );
+
+}
+
+
+/* ==========================================================
+   OBSTACLE
+   ========================================================== */
+
+.tile.obstacle {
+
+    background:
+        #343d44;
+
+}
+
+
+.tile.obstacle::before {
+
+    background:
+        #171c21;
+
+}
+
+
+.tile.obstacle::after {
+
+    background:
+        linear-gradient(
+            45deg,
+            transparent 42%,
+            #38444d 43%,
+            #38444d 57%,
+            transparent 58%
+        );
+
+}
+
+
+.tile.obstacle:hover {
+
+    background:
+        var(--red);
+
+}
+
+
+/* ==========================================================
+   INDICATEUR DES SECTEURS
+   ========================================================== */
+
+.sector-1 .sector-label {
+
+    color:
+        var(--cyan);
+
+}
+
+
+.sector-2 .sector-label {
+
+    color:
+        var(--green);
+
+}
+
+
+.sector-3 .sector-label {
+
+    color:
+        var(--orange);
+
+}
+
+
+.sector-4 .sector-label {
+
+    color:
+        var(--red);
+
+}
+
+
+.sector-5 .sector-label {
+
+    color:
+        var(--violet);
+
+}
+
+
+.sector-6 .sector-label {
+
+    color:
+        var(--blue);
+
+}
+
+
+.sector-7 .sector-label {
+
+    color:
+        var(--yellow);
+
+}
+
+
+.sector-8 .sector-label {
+
+    color:
+        var(--pink);
+
+}
+
+
+/* ==========================================================
+   MENU GÉNÉRAL
+   ========================================================== */
+
+.edge-menu {
+
+    position: fixed;
+
+    z-index: 100;
+
+    background:
+        rgba(
+            7,
+            13,
+            19,
+            0.97
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        0 0 40px
+        rgba(
+            0,
+            0,
+            0,
+            0.6
+        );
+
+    transition:
+        transform 0.3s
+        cubic-bezier(
+            0.2,
+            0.8,
+            0.2,
+            1
+        );
+
+}
+
+
+/* ==========================================================
+   MENU HAUT
+   ========================================================== */
+
+.menu-top {
+
+    top: 0;
+
+    left: 50%;
+
+    width:
+        min(
+            850px,
+            80vw
+        );
+
+    height: 62px;
+
+    transform:
+        translate(
+            -50%,
+            calc(
+                -100% +
+                var(--menu-trigger)
+            )
+        );
+
+    border-top: 0;
+
+}
+
+
+.menu-top:hover {
+
+    transform:
+        translate(
+            -50%,
+            0
+        );
+
+}
+
+
+.menu-top::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 0;
+
+    width: 70px;
+
+    height: 2px;
+
+    transform:
+        translateX(-50%);
+
+    background:
+        var(--cyan);
+
+    box-shadow:
+        0 0 10px
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   MENU BAS
+   ========================================================== */
+
+.menu-bottom {
+
+    bottom: 0;
+
+    left: 50%;
+
+    width:
+        min(
+            850px,
+            80vw
+        );
+
+    height: 62px;
+
+    transform:
+        translate(
+            -50%,
+            calc(
+                100% -
+                var(--menu-trigger)
+            )
+        );
+
+    border-bottom: 0;
+
+}
+
+
+.menu-bottom:hover {
+
+    transform:
+        translate(
+            -50%,
+            0
+        );
+
+}
+
+
+.menu-bottom::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 0;
+
+    width: 70px;
+
+    height: 2px;
+
+    transform:
+        translateX(-50%);
+
+    background:
+        var(--cyan);
+
+    box-shadow:
+        0 0 10px
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   MENU GAUCHE
+   ========================================================== */
+
+.menu-left {
+
+    top: 50%;
+
+    left: 0;
+
+    width: 240px;
+
+    height: 390px;
+
+    transform:
+        translate(
+            calc(
+                -100% +
+                var(--menu-trigger)
+            ),
+            -50%
+        );
+
+    border-left: 0;
+
+}
+
+
+.menu-left:hover {
+
+    transform:
+        translate(
+            0,
+            -50%
+        );
+
+}
+
+
+.menu-left::after {
+
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+
+    top: 50%;
+
+    width: 2px;
+
+    height: 70px;
+
+    transform:
+        translateY(-50%);
+
+    background:
+        var(--cyan);
+
+    box-shadow:
+        0 0 10px
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   MENU DROITE
+   ========================================================== */
+
+.menu-right {
+
+    top: 50%;
+
+    right: 0;
+
+    width: 240px;
+
+    height: 390px;
+
+    transform:
+        translate(
+            calc(
+                100% -
+                var(--menu-trigger)
+            ),
+            -50%
+        );
+
+    border-right: 0;
+
+}
+
+
+.menu-right:hover {
+
+    transform:
+        translate(
+            0,
+            -50%
+        );
+
+}
+
+
+.menu-right::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 50%;
+
+    width: 2px;
+
+    height: 70px;
+
+    transform:
+        translateY(-50%);
+
+    background:
+        var(--cyan);
+
+    box-shadow:
+        0 0 10px
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   CONTENU DES MENUS
+   ========================================================== */
+
+.menu-inner {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content:
+        space-evenly;
+
+    padding:
+        0 20px;
+
+}
+
+
+.menu-inner.vertical {
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding:
+        35px 25px;
+
+}
+
+
+/* ==========================================================
+   LOGO
+   ========================================================== */
+
+.game-logo {
+
+    color:
+        var(--text);
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    letter-spacing:
+        0.1em;
+
+}
+
+
+.game-logo span {
+
+    color:
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   BOUTONS
+   ========================================================== */
+
+button {
+
+    border:
+        1px solid
+        transparent;
+
+    background:
+        transparent;
+
+    color:
+        var(--muted);
+
+    padding:
+        11px 14px;
+
+    font-family:
+        inherit;
+
+    font-size: 9px;
+
+    letter-spacing:
+        0.14em;
+
+    cursor: pointer;
+
+    transition:
+        all 0.15s ease;
+
+}
+
+
+button:hover {
+
+    color:
+        var(--cyan);
+
+    border-color:
+        var(--border-light);
+
+    background:
+        rgba(
+            0,
+            229,
+            255,
+            0.05
+        );
+
+}
+
+
+button.primary {
+
+    color:
+        #041016;
+
+    background:
+        var(--cyan);
+
+    border-color:
+        var(--cyan);
+
+}
+
+
+button.primary:hover {
+
+    color:
+        #041016;
+
+    background:
+        var(--green);
+
+    border-color:
+        var(--green);
+
+}
+
+
+/* ==========================================================
+   TITRE MENU
+   ========================================================== */
+
+.menu-title {
+
+    color:
+        var(--cyan);
+
+    font-size: 9px;
+
+    letter-spacing:
+        0.25em;
+
+    padding-bottom:
+        12px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+}
+
+
+/* ==========================================================
+   PLAYER
+   ========================================================== */
+
+.player {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        12px 0;
+
+}
+
+
+.player-avatar {
+
+    width: 42px;
+
+    height: 42px;
+
+    display: grid;
+
+    place-items: center;
+
+    color:
+        var(--cyan);
+
+    border:
+        1px solid
+        var(--cyan);
+
+    font-size: 9px;
+
+    clip-path:
+        polygon(
+            29% 0%,
+            71% 0%,
+            100% 29%,
+            100% 71%,
+            71% 100%,
+            29% 100%,
+            0% 71%,
+            0% 29%
+        );
+
+}
+
+
+.player-info strong {
+
+    display: block;
+
+    font-size: 9px;
+
+}
+
+
+.player-info span {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color:
+        var(--green);
+
+    font-size: 8px;
+
+}
+
+
+/* ==========================================================
+   STATUS
+   ========================================================== */
+
+.game-status {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color:
+        var(--green);
+
+    font-size: 9px;
+
+}
+
+
+.status-light {
+
+    width: 6px;
+
+    height: 6px;
+
+    border-radius: 50%;
+
+    background:
+        var(--green);
+
+    box-shadow:
+        0 0 9px
+        var(--green);
+
+}
+
+
+.stat {
+
+    color:
+        var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+.stat strong {
+
+    color:
+        var(--cyan);
+
+    font-weight:
+        normal;
+
+}
+
+
+/* ==========================================================
+   INDICATION
+   ========================================================== */
+
+.hint {
+
+    position: absolute;
+
+    bottom: 75px;
+
+    color:
+        var(--muted);
+
+    font-size: 8px;
+
+    letter-spacing:
+        0.25em;
+
+}
+
+
+.hint span {
+
+    color:
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   NOTIFICATION
+   ========================================================== */
+
+.notification {
+
+    position: fixed;
+
+    z-index: 300;
+
+    top: 25px;
+
+    left: 50%;
+
+    padding:
+        10px 18px;
+
+    border:
+        1px solid
+        var(--cyan);
+
+    background:
+        rgba(
+            5,
+            8,
+            12,
+            0.96
+        );
+
+    color:
+        var(--cyan);
+
+    font-size: 9px;
+
+    transform:
+        translate(
+            -50%,
+            -100px
+        );
+
+    transition:
+        transform 0.25s ease;
+
+}
+
+
+.notification.show {
+
+    transform:
+        translate(
+            -50%,
+            0
+        );
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1000px) {
+
+    :root {
+
+        --tile-size: 50px;
+
+    }
+
+
+    .board {
+
+        min-width: 440px;
+
+        min-height: 440px;
+
+    }
+
+
+    .sector-label {
+
+        margin-top: -275px;
+
+    }
+
+
+    .game-header {
+
+        width: 75vw;
+
+    }
+
+
+    .menu-left,
+    .menu-right {
+
+        width: 190px;
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    :root {
+
+        --tile-size: 42px;
+
+    }
+
+
+    .board {
+
+        min-width: 380px;
+
+        min-height: 380px;
+
+    }
+
+
+    .sector-label {
+
+        margin-top: -235px;
+
+        font-size: 7px;
+
+    }
+
+
+    .game-header {
+
+        width: 82vw;
+
+    }
+
+
+    .game-header h1 {
+
+        font-size: 20px;
+
+    }
+
+
+    .menu-left,
+    .menu-right {
+
+        width: 170px;
+
+    }
+
+}
+
+
+@media (max-height: 700px) {
+
+    .game-header {
+
+        top: 68px;
+
+    }
+
+
+    .board {
+
+        transform:
+            scale(0.82);
+
+    }
+
+
+    .hint {
+
+        bottom: 65px;
+
+    }
+
+}
