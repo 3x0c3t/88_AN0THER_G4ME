@@ -287,6 +287,7 @@
             <div
                 id="board"
                 class="board"
+                aria-label="Plateau de jeu octogonal à 8 secteurs"
             ></div>
 
         </section>
@@ -298,10 +299,18 @@
 
         <div class="hint">
 
-            <span>DRAG</span>
+            <span>
+                DRAG
+            </span>
+
             &nbsp;ROTATE MAP
+
             &nbsp;&nbsp;·&nbsp;&nbsp;
-            <span>CLICK</span>
+
+            <span>
+                CLICK
+            </span>
+
             &nbsp;SELECT TILE
 
         </div>
@@ -317,6 +326,8 @@
     <div
         id="notification"
         class="notification"
+        role="status"
+        aria-live="polite"
     ></div>
 
 

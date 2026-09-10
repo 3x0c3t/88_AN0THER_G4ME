@@ -1,14 +1,16 @@
 /* ============================================================
    88_AN0THER_G4ME
    OCTO GRID
-   v1.0
+   v1.1
 
    MAP :
+   - grille octogonale
    - plateau circulaire
    - 8 secteurs de 45°
-   - 8 joueurs
-   - rotation libre du plateau
+   - 8 joueurs maximum
+   - chaque secteur = territoire joueur
    - montagne centrale 3 x 3
+   - rotation libre du plateau
    ============================================================ */
 
 "use strict";
@@ -22,13 +24,14 @@ const PLAYERS = 8;
 
 const GRID_RADIUS = 7;
 
-const SECTOR_ANGLE = 360 / PLAYERS;
+const SECTOR_ANGLE =
+    360 / PLAYERS;
 
 const CENTER_PLAYER = 0;
 
 
 /* ============================================================
-   ÉTAT
+   ETAT DU JEU
    ============================================================ */
 
 let currentPlayer = 1;
@@ -60,11 +63,6 @@ let pointerStartY = 0;
 
 let hasDragged = false;
 
-
-/*
- * Distance minimale avant de considérer
- * le mouvement comme une rotation.
- */
 const ROTATION_THRESHOLD = 5;
 
 
@@ -73,7 +71,9 @@ const ROTATION_THRESHOLD = 5;
    ============================================================ */
 
 const board =
-    document.getElementById("board");
+    document.getElementById(
+        "board"
+    );
 
 const notification =
     document.getElementById(
@@ -81,13 +81,19 @@ const notification =
     );
 
 const turnDisplay =
-    document.getElementById("turn");
+    document.getElementById(
+        "turn"
+    );
 
 const scoreDisplay =
-    document.getElementById("score");
+    document.getElementById(
+        "score"
+    );
 
 const actionDisplay =
-    document.getElementById("action");
+    document.getElementById(
+        "action"
+    );
 
 const coordinatesDisplay =
     document.getElementById(
@@ -96,7 +102,7 @@ const coordinatesDisplay =
 
 
 /* ============================================================
-   COULEURS
+   COULEURS JOUEURS
    ============================================================ */
 
 const PLAYER_COLORS = {
@@ -181,25 +187,29 @@ const OBSTACLES = [
    MONTAGNE CENTRALE
    ============================================================ */
 
-function isMountainTile(x, y) {
+function isMountainTile(
+    x,
+    y
+) {
 
     return (
-
         Math.max(
             Math.abs(x),
             Math.abs(y)
         ) <= 1
-
     );
 
 }
 
 
 /* ============================================================
-   DISTANCE
+   DISTANCE AU CENTRE
    ============================================================ */
 
-function distanceFromCenter(x, y) {
+function distanceFromCenter(
+    x,
+    y
+) {
 
     return Math.sqrt(
         x * x +
@@ -213,51 +223,84 @@ function distanceFromCenter(x, y) {
    APPARTENANCE AU PLATEAU
    ============================================================ */
 
-function isInsideBoard(x, y) {
+/*
+ * Le plateau est circulaire.
+ *
+ * La grille reste carrée en coordonnées logiques,
+ * mais sa limite extérieure forme un disque.
+ *
+ * Les octogones remplissent donc les 8 secteurs
+ * sans créer huit grilles indépendantes.
+ */
+
+function isInsideBoard(
+    x,
+    y
+) {
 
     return (
-
-        distanceFromCenter(x, y)
+        distanceFromCenter(
+            x,
+            y
+        )
         <=
         GRID_RADIUS + 0.35
-
     );
 
 }
 
 
 /* ============================================================
-   DÉTERMINATION DU JOUEUR
+   ANGLE LOGIQUE
    ============================================================ */
 
-function getPlayerFromPosition(
+/*
+ * Retourne l'angle d'une cellule en degrés.
+ *
+ * 0° est placé vers le haut.
+ *
+ * On obtient donc :
+ *
+ *              P1
+ *          ┌────────┐
+ *      P8  │        │  P2
+ *          │        │
+ *      P7  │ CENTRE │  P3
+ *          │        │
+ *      P6  │        │  P4
+ *          └────────┘
+ *              P5
+ *
+ * Chaque joueur possède exactement 45°.
+ */
+
+function getAngleFromPosition(
     x,
     y
 ) {
 
-    if (
-        isMountainTile(x, y)
-    ) {
-
-        return CENTER_PLAYER;
-
-    }
-
-
     let angle =
-        Math.atan2(y, x)
+        Math.atan2(
+            y,
+            x
+        )
         *
         180
         /
         Math.PI;
 
-
     /*
-     * Rotation logique initiale.
+     * Rotation de référence :
      *
-     * Le premier secteur commence
-     * vers le haut.
+     * Math.atan2()
+     * 0° = droite
+     *
+     * +90° = bas
+     *
+     * On ajoute 90° pour placer
+     * le secteur P1 en haut.
      */
+
     angle += 90;
 
 
@@ -279,12 +322,60 @@ function getPlayerFromPosition(
     }
 
 
+    return angle;
+
+}
+
+
+/* ============================================================
+   JOUEUR D'UNE POSITION
+   ============================================================ */
+
+function getPlayerFromPosition(
+    x,
+    y
+) {
+
+    /*
+     * Le centre appartient à la montagne.
+     */
+
+    if (
+        isMountainTile(
+            x,
+            y
+        )
+    ) {
+
+        return CENTER_PLAYER;
+
+    }
+
+
+    const angle =
+        getAngleFromPosition(
+            x,
+            y
+        );
+
+
+    /*
+     * Chaque secteur fait 45°.
+     */
+
     const sector =
         Math.floor(
             angle /
             SECTOR_ANGLE
         );
 
+
+    /*
+     * 0 -> P1
+     * 1 -> P2
+     * ...
+     * 7 -> P8
+     */
 
     return (
         sector + 1
@@ -294,7 +385,7 @@ function getPlayerFromPosition(
 
 
 /* ============================================================
-   CRÉATION CELLULE
+   CREATION D'UNE CELLULE
    ============================================================ */
 
 function createTile(
@@ -315,16 +406,21 @@ function createTile(
     tile.dataset.x =
         String(x);
 
-
     tile.dataset.y =
         String(y);
 
+
+    /*
+     * Positionnement de la cellule.
+     *
+     * --x et --y sont utilisés directement
+     * par le CSS.
+     */
 
     tile.style.setProperty(
         "--x",
         String(x)
     );
-
 
     tile.style.setProperty(
         "--y",
@@ -332,11 +428,15 @@ function createTile(
     );
 
 
-    /*
-     * MONTAGNE
-     */
+    /* ========================================================
+       MONTAGNE CENTRALE
+       ======================================================== */
+
     if (
-        isMountainTile(x, y)
+        isMountainTile(
+            x,
+            y
+        )
     ) {
 
         tile.classList.add(
@@ -345,12 +445,18 @@ function createTile(
 
 
         tile.dataset.player =
-            String(CENTER_PLAYER);
+            String(
+                CENTER_PLAYER
+            );
 
 
         tile.dataset.mountain =
             "true";
 
+
+        /*
+         * Case centrale.
+         */
 
         if (
             x === 0 &&
@@ -368,7 +474,14 @@ function createTile(
                 </span>
             `;
 
-        } else {
+        }
+
+
+        /*
+         * Autres cases de la montagne.
+         */
+
+        else {
 
             tile.innerHTML = `
                 <span class="mountain-mark">
@@ -381,9 +494,10 @@ function createTile(
     }
 
 
-    /*
-     * TERRAIN JOUEUR
-     */
+    /* ========================================================
+       TERRITOIRE JOUEUR
+       ======================================================== */
+
     else {
 
         const player =
@@ -417,9 +531,10 @@ function createTile(
     }
 
 
-    /*
-     * OBSTACLE
-     */
+    /* ========================================================
+       OBSTACLE
+       ======================================================== */
+
     const obstacle =
         OBSTACLES.find(
             item =>
@@ -428,7 +543,9 @@ function createTile(
         );
 
 
-    if (obstacle) {
+    if (
+        obstacle
+    ) {
 
         tile.classList.add(
             "obstacle"
@@ -448,9 +565,10 @@ function createTile(
     }
 
 
-    /*
-     * ÉVÉNEMENTS
-     */
+    /* ========================================================
+       EVENEMENTS
+       ======================================================== */
+
     tile.addEventListener(
         "click",
         handleTileClick
@@ -482,12 +600,14 @@ function createTile(
 
 
 /* ============================================================
-   CRÉATION PLATEAU
+   CREATION DU PLATEAU
    ============================================================ */
 
 function createBoard() {
 
-    if (!board) {
+    if (
+        !board
+    ) {
 
         return;
 
@@ -500,6 +620,14 @@ function createBoard() {
 
     tiles = [];
 
+
+    /*
+     * Grille complète :
+     *
+     * -14 -> +14
+     *
+     * puis filtrage par cercle.
+     */
 
     for (
         let y = -GRID_RADIUS;
@@ -546,7 +674,9 @@ function createBoard() {
 
 function updateBoardRotation() {
 
-    if (!board) {
+    if (
+        !board
+    ) {
 
         return;
 
@@ -562,7 +692,7 @@ function updateBoardRotation() {
 
 
 /* ============================================================
-   ANGLE D'UN POINT AUTOUR DU CENTRE
+   ANGLE DU POINTEUR
    ============================================================ */
 
 function getPointerAngle(
@@ -586,12 +716,14 @@ function getPointerAngle(
     return (
 
         Math.atan2(
-            event.clientY - centerY,
-            event.clientX - centerX
+            event.clientY -
+                centerY,
+
+            event.clientX -
+                centerX
         )
 
         *
-
         180
         /
         Math.PI
@@ -602,7 +734,7 @@ function getPointerAngle(
 
 
 /* ============================================================
-   DÉBUT ROTATION
+   DEBUT ROTATION
    ============================================================ */
 
 function handlePointerDown(
@@ -621,6 +753,7 @@ function handlePointerDown(
     isRotating = true;
 
     hasDragged = false;
+
 
     pointerStartX =
         event.clientX;
@@ -707,9 +840,10 @@ function handlePointerMove(
 
 
     /*
-     * Corrige le passage
-     * +180 / -180.
+     * Correction du passage
+     * -180 / +180.
      */
+
     if (
         delta > 180
     ) {
@@ -769,7 +903,9 @@ function handlePointerUp(
             event.pointerId
         );
 
-    } catch (
+    }
+
+    catch (
         error
     ) {
 
@@ -791,9 +927,10 @@ function handleTileClick(
 ) {
 
     /*
-     * Si le clic vient d'un drag,
-     * on ne sélectionne pas la cellule.
+     * Un drag ne doit pas sélectionner
+     * une cellule.
      */
+
     if (
         hasDragged
     ) {
@@ -833,9 +970,10 @@ function handleTileClick(
     );
 
 
-    /*
-     * MONTAGNE
-     */
+    /* ========================================================
+       MONTAGNE
+       ======================================================== */
+
     if (
         tile.dataset.mountain ===
         "true"
@@ -861,9 +999,10 @@ function handleTileClick(
     }
 
 
-    /*
-     * OBSTACLE
-     */
+    /* ========================================================
+       OBSTACLE
+       ======================================================== */
+
     if (
         tile.dataset.obstacle ===
         "true"
@@ -879,9 +1018,10 @@ function handleTileClick(
     }
 
 
-    /*
-     * SÉLECTION
-     */
+    /* ========================================================
+       SELECTION
+       ======================================================== */
+
     selectTile(
         tile
     );
@@ -906,7 +1046,7 @@ function handleTileClick(
 
 
 /* ============================================================
-   SÉLECTION
+   SELECTION
    ============================================================ */
 
 function selectTile(
@@ -1019,7 +1159,6 @@ function handleTileLeave() {
         const x =
             selectedTile.dataset.x;
 
-
         const y =
             selectedTile.dataset.y;
 
@@ -1033,7 +1172,9 @@ function handleTileLeave() {
                 `MOUNTAIN · X${x} · Y${y}`
             );
 
-        } else {
+        }
+
+        else {
 
             setAction(
                 `SELECTED · X${x} · Y${y}`
@@ -1055,7 +1196,7 @@ function handleTileLeave() {
 
 
 /* ============================================================
-   COORDONNÉES
+   COORDONNEES
    ============================================================ */
 
 function updateCoordinates(
@@ -1228,7 +1369,6 @@ function resetGame() {
 
     updateScore();
 
-
     updateCoordinates(
         0,
         0
@@ -1303,7 +1443,12 @@ function updateTurn() {
     ) {
 
         player.textContent =
-            `PLAYER ${String(currentPlayer).padStart(2, "0")}`;
+            `PLAYER ${String(
+                currentPlayer
+            ).padStart(
+                2,
+                "0"
+            )}`;
 
     }
 
@@ -1331,8 +1476,12 @@ function showNotification(
         message;
 
 
+    /*
+     * Le CSS utilise maintenant .show.
+     */
+
     notification.classList.add(
-        "visible"
+        "show"
     );
 
 
@@ -1346,7 +1495,7 @@ function showNotification(
             () => {
 
                 notification.classList.remove(
-                    "visible"
+                    "show"
                 );
 
             },
@@ -1400,7 +1549,9 @@ function saveGame() {
 
     localStorage.setItem(
         "88_AN0THER_G4ME_SAVE",
-        JSON.stringify(data)
+        JSON.stringify(
+            data
+        )
     );
 
 
@@ -1431,7 +1582,6 @@ function loadGame() {
             "NO SAVE FOUND"
         );
 
-
         return;
 
     }
@@ -1448,8 +1598,10 @@ function loadGame() {
         currentPlayer =
             Math.max(
                 1,
+
                 Math.min(
                     PLAYERS,
+
                     Number(
                         data.currentPlayer
                     ) || 1
@@ -1460,6 +1612,7 @@ function loadGame() {
         turn =
             Math.max(
                 1,
+
                 Number(
                     data.turn
                 ) || 1
@@ -1469,6 +1622,7 @@ function loadGame() {
         score =
             Math.max(
                 0,
+
                 Number(
                     data.score
                 ) || 0
@@ -1534,8 +1688,10 @@ function loadGame() {
             "GAME LOADED"
         );
 
+    }
 
-    } catch (
+
+    catch (
         error
     ) {
 
@@ -1601,7 +1757,7 @@ document.addEventListener(
             case "settings":
 
                 showNotification(
-                    "SETTINGS v1.0"
+                    "SETTINGS v1.1"
                 );
 
                 break;
@@ -1631,7 +1787,9 @@ document.addEventListener(
                         "ACTION ON SELECTED TILE"
                     );
 
-                } else {
+                }
+
+                else {
 
                     showNotification(
                         "SELECT A TILE FIRST"
@@ -1687,28 +1845,34 @@ document.addEventListener(
    ROTATION SOURIS / TOUCH
    ============================================================ */
 
-board.addEventListener(
-    "pointerdown",
-    handlePointerDown
-);
+if (
+    board
+) {
+
+    board.addEventListener(
+        "pointerdown",
+        handlePointerDown
+    );
 
 
-board.addEventListener(
-    "pointermove",
-    handlePointerMove
-);
+    board.addEventListener(
+        "pointermove",
+        handlePointerMove
+    );
 
 
-board.addEventListener(
-    "pointerup",
-    handlePointerUp
-);
+    board.addEventListener(
+        "pointerup",
+        handlePointerUp
+    );
 
 
-board.addEventListener(
-    "pointercancel",
-    handlePointerUp
-);
+    board.addEventListener(
+        "pointercancel",
+        handlePointerUp
+    );
+
+}
 
 
 /* ============================================================
@@ -1810,9 +1974,9 @@ setAction(
 
 
 console.log(
-    "88_AN0THER_G4ME v1.0"
+    "88_AN0THER_G4ME v1.1"
 );
 
 console.log(
-    "8 secteurs · plateau circulaire · rotation libre"
+    "8 joueurs · 8 secteurs · grille octogonale · rotation libre"
 );

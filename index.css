@@ -1,13 +1,13 @@
-/* ==========================================================
+/* ============================================================
    88_AN0THER_G4ME
    OCTO GRID
-   v1.0
-   ========================================================== */
+   v1.1
+   ============================================================ */
 
 
-/* ==========================================================
+/* ============================================================
    VARIABLES
-   ========================================================== */
+   ============================================================ */
 
 :root {
 
@@ -33,9 +33,9 @@
         #687a84;
 
 
-    /* ======================================================
+    /* ========================================================
        8 JOUEURS
-       ====================================================== */
+       ======================================================== */
 
     --p1:
         #00e5ff;
@@ -62,9 +62,9 @@
         #3d8bff;
 
 
-    /* ======================================================
+    /* ========================================================
        MONTAGNE
-       ====================================================== */
+       ======================================================== */
 
     --mountain-dark:
         #11171c;
@@ -79,19 +79,47 @@
         #9aadb7;
 
 
-    /* ======================================================
-       MENU
-       ====================================================== */
+    /* ========================================================
+       GEOMETRIE DU PLATEAU
+       ======================================================== */
 
-    --menu-trigger:
-        8px;
+    --board-size:
+        min(72vh, 72vw);
+
+    /*
+     * Une cellule est un octogone régulier approximatif.
+     *
+     * Pour que deux octogones soient réellement jointifs :
+     *
+     *     largeur cellule = largeur du pas
+     *
+     * On utilise ici un pas correspondant à la géométrie
+     * d'une grille orthogonale.
+     */
+
+    --grid-step:
+        calc(var(--board-size) / 15);
+
+    --tile-size:
+        var(--grid-step);
+
+
+    /* ========================================================
+       INTERFACE
+       ======================================================== */
+
+    --menu-width:
+        150px;
+
+    --menu-height:
+        44px;
 
 }
 
 
-/* ==========================================================
+/* ============================================================
    RESET
-   ========================================================== */
+   ============================================================ */
 
 * {
 
@@ -111,6 +139,9 @@ body {
         100%;
 
     margin:
+        0;
+
+    padding:
         0;
 
 }
@@ -140,9 +171,9 @@ body {
 }
 
 
-/* ==========================================================
-   JEU
-   ========================================================== */
+/* ============================================================
+   GAME
+   ============================================================ */
 
 .game {
 
@@ -167,9 +198,9 @@ body {
 }
 
 
-/* ==========================================================
+/* ============================================================
    HEADER
-   ========================================================== */
+   ============================================================ */
 
 .game-header {
 
@@ -178,8 +209,8 @@ body {
 
     top:
         clamp(
-            54px,
-            9vh,
+            52px,
+            8vh,
             82px
         );
 
@@ -205,7 +236,10 @@ body {
         space-between;
 
     z-index:
-        20;
+        1000;
+
+    pointer-events:
+        none;
 
 }
 
@@ -270,9 +304,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   CONTENEUR DU PLATEAU
-   ========================================================== */
+/* ============================================================
+   BOARD CONTAINER
+   ============================================================ */
 
 .board-container {
 
@@ -300,28 +334,11 @@ h1 span {
 }
 
 
-/* ==========================================================
-   PLATEAU CIRCULAIRE
-   ========================================================== */
+/* ============================================================
+   BOARD
+   ============================================================ */
 
 .board {
-
-    --board-size:
-        min(
-            74vh,
-            74vw
-        );
-
-    --tile-step:
-        calc(
-            var(--board-size) / 15.6
-        );
-
-    --tile-size:
-        calc(
-            var(--tile-step) * 1.06
-        );
-
 
     position:
         relative;
@@ -335,6 +352,9 @@ h1 span {
     flex:
         0 0 var(--board-size);
 
+    display:
+        block;
+
     border-radius:
         50%;
 
@@ -345,9 +365,9 @@ h1 span {
 
         radial-gradient(
             circle at center,
-            #101b23 0%,
-            #0b141b 46%,
-            #071016 76%,
+            #17252e 0%,
+            #0d171e 42%,
+            #081117 72%,
             #050b10 100%
         );
 
@@ -373,7 +393,7 @@ h1 span {
             0.8
         ),
 
-        inset 0 0 50px
+        inset 0 0 55px
         rgba(
             0,
             229,
@@ -405,9 +425,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   ROTATION ACTIVE
-   ========================================================== */
+/* ============================================================
+   ROTATION
+   ============================================================ */
 
 .board.is-rotating {
 
@@ -446,9 +466,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   CERCLES DE REPÈRE
-   ========================================================== */
+/* ============================================================
+   CERCLES DE REFERENCE
+   ============================================================ */
 
 .board::before {
 
@@ -459,7 +479,7 @@ h1 span {
         absolute;
 
     inset:
-        6%;
+        4%;
 
     border-radius:
         50%;
@@ -475,7 +495,7 @@ h1 span {
 
     box-shadow:
 
-        0 0 0 11%
+        0 0 0 12%
         rgba(
             0,
             229,
@@ -483,7 +503,7 @@ h1 span {
             0.025
         ),
 
-        0 0 0 22%
+        0 0 0 24%
         rgba(
             0,
             229,
@@ -491,7 +511,7 @@ h1 span {
             0.025
         ),
 
-        0 0 0 33%
+        0 0 0 36%
         rgba(
             0,
             229,
@@ -508,9 +528,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   8 RAYONS DE SECTEURS
-   ========================================================== */
+/* ============================================================
+   8 SECTEURS RADIAUX
+   ============================================================ */
 
 .board::after {
 
@@ -530,29 +550,34 @@ h1 span {
 
         repeating-conic-gradient(
             from -22.5deg,
+
             rgba(
                 255,
                 255,
                 255,
-                0.08
+                0.16
             )
-            0deg 0.35deg,
+
+            0deg
+            0.45deg,
+
             transparent
-            0.35deg 45deg
+            0.45deg
+            45deg
         );
 
     pointer-events:
         none;
 
     z-index:
-        2;
+        40;
 
 }
 
 
-/* ==========================================================
-   CELLULES
-   ========================================================== */
+/* ============================================================
+   CELLULE OCTOGONALE
+   ============================================================ */
 
 .tile {
 
@@ -576,33 +601,56 @@ h1 span {
             var(--tile-size) / -2
         );
 
+    /*
+     * IMPORTANT
+     *
+     * Les cases sont positionnées avec exactement le même
+     * pas que leur largeur.
+     *
+     * Elles ne sont donc plus espacées artificiellement.
+     */
+
     transform:
 
         translate(
             calc(
                 var(--x)
-                * var(--tile-step)
+                * var(--grid-step)
             ),
+
             calc(
                 var(--y)
-                * var(--tile-step)
+                * var(--grid-step)
             )
         );
 
     background:
         #18232a;
 
+    /*
+     * OCTOGONE
+     */
+
     clip-path:
 
         polygon(
-            29% 0%,
-            71% 0%,
-            100% 29%,
-            100% 71%,
-            71% 100%,
-            29% 100%,
-            0% 71%,
-            0% 29%
+
+            29.289% 0%,
+
+            70.711% 0%,
+
+            100% 29.289%,
+
+            100% 70.711%,
+
+            70.711% 100%,
+
+            29.289% 100%,
+
+            0% 70.711%,
+
+            0% 29.289%
+
         );
 
     cursor:
@@ -628,9 +676,16 @@ h1 span {
 }
 
 
-/* ==========================================================
-   INTÉRIEUR DES CELLULES
-   ========================================================== */
+/* ============================================================
+   JOINT ENTRE OCTOGONES
+   ============================================================ */
+
+/*
+ * Aucun margin / gap supplémentaire.
+ *
+ * Le contour sombre est interne à la cellule et non un espace
+ * entre les cellules.
+ */
 
 .tile::before {
 
@@ -641,13 +696,16 @@ h1 span {
         absolute;
 
     inset:
-        2px;
+        1px;
 
     background:
         #0c151b;
 
     clip-path:
         inherit;
+
+    pointer-events:
+        none;
 
 }
 
@@ -661,7 +719,7 @@ h1 span {
         absolute;
 
     inset:
-        5px;
+        3px;
 
     border:
         1px solid
@@ -675,12 +733,15 @@ h1 span {
     clip-path:
         inherit;
 
+    pointer-events:
+        none;
+
 }
 
 
-/* ==========================================================
-   COULEUR DES 8 JOUEURS
-   ========================================================== */
+/* ============================================================
+   COULEURS JOUEURS
+   ============================================================ */
 
 .player-1 {
 
@@ -746,9 +807,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   TERRAIN NORMAL
-   ========================================================== */
+/* ============================================================
+   TERRITOIRES
+   ============================================================ */
 
 .tile.player-1,
 .tile.player-2,
@@ -764,7 +825,7 @@ h1 span {
         color-mix(
             in srgb,
             var(--player-color)
-            24%,
+            22%,
             #111a20
         );
 
@@ -778,7 +839,7 @@ h1 span {
             0,
             229,
             255,
-            0.09
+            0.10
         );
 
 }
@@ -791,7 +852,7 @@ h1 span {
             0,
             255,
             153,
-            0.09
+            0.10
         );
 
 }
@@ -804,7 +865,7 @@ h1 span {
             255,
             230,
             0,
-            0.09
+            0.10
         );
 
 }
@@ -817,7 +878,7 @@ h1 span {
             255,
             64,
             87,
-            0.09
+            0.10
         );
 
 }
@@ -830,7 +891,7 @@ h1 span {
             255,
             138,
             0,
-            0.09
+            0.10
         );
 
 }
@@ -843,7 +904,7 @@ h1 span {
             255,
             59,
             212,
-            0.09
+            0.10
         );
 
 }
@@ -856,7 +917,7 @@ h1 span {
             168,
             85,
             255,
-            0.09
+            0.10
         );
 
 }
@@ -869,15 +930,15 @@ h1 span {
             61,
             139,
             255,
-            0.09
+            0.10
         );
 
 }
 
 
-/* ==========================================================
-   NUMÉRO JOUEUR
-   ========================================================== */
+/* ============================================================
+   NUMERO DU JOUEUR
+   ============================================================ */
 
 .tile-number {
 
@@ -919,10 +980,9 @@ h1 span {
 }
 
 
-/* ==========================================================
+/* ============================================================
    HOVER
-   Même couleur que le terrain
-   ========================================================== */
+   ============================================================ */
 
 .tile.player-1:hover,
 .tile.player-2:hover,
@@ -938,24 +998,31 @@ h1 span {
         translate(
             calc(
                 var(--x)
-                * var(--tile-step)
+                * var(--grid-step)
             ),
+
             calc(
                 var(--y)
-                * var(--tile-step)
+                * var(--grid-step)
             )
         )
 
-        scale(1.08);
+        scale(
+            1.06
+        );
 
     background:
         var(--player-color);
 
     filter:
 
-        brightness(1.18)
+        brightness(
+            1.18
+        )
 
-        saturate(1.3)
+        saturate(
+            1.3
+        )
 
         drop-shadow(
             0 0 7px
@@ -978,6 +1045,7 @@ h1 span {
 .tile.player-8:hover::before {
 
     background:
+
         rgba(
             5,
             10,
@@ -988,10 +1056,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   SÉLECTION
-   Même couleur, plus intense
-   ========================================================== */
+/* ============================================================
+   SELECTION
+   ============================================================ */
 
 .tile.selected {
 
@@ -1000,24 +1067,31 @@ h1 span {
         translate(
             calc(
                 var(--x)
-                * var(--tile-step)
+                * var(--grid-step)
             ),
+
             calc(
                 var(--y)
-                * var(--tile-step)
+                * var(--grid-step)
             )
         )
 
-        scale(1.12);
+        scale(
+            1.10
+        );
 
     background:
         var(--player-color);
 
     filter:
 
-        brightness(1.55)
+        brightness(
+            1.5
+        )
 
-        saturate(1.5)
+        saturate(
+            1.5
+        )
 
         drop-shadow(
             0 0 10px
@@ -1025,13 +1099,14 @@ h1 span {
         )
 
         drop-shadow(
-            0 0 24px
+            0 0 22px
             var(--player-color)
         );
 
     box-shadow:
 
-        inset 0 0 0 2px
+        inset
+        0 0 0 2px
         rgba(
             255,
             255,
@@ -1051,6 +1126,7 @@ h1 span {
 .tile.selected::before {
 
     background:
+
         rgba(
             255,
             255,
@@ -1064,9 +1140,10 @@ h1 span {
 .tile.selected::after {
 
     inset:
-        4px;
+        3px;
 
     border:
+
         2px solid
         rgba(
             255,
@@ -1078,9 +1155,9 @@ h1 span {
 }
 
 
-/* ==========================================================
+/* ============================================================
    MONTAGNE CENTRALE 3 x 3
-   ========================================================== */
+   ============================================================ */
 
 .tile.mountain-tile {
 
@@ -1117,9 +1194,10 @@ h1 span {
 .tile.mountain-tile::after {
 
     inset:
-        5px;
+        3px;
 
     border:
+
         1px solid
         rgba(
             180,
@@ -1131,9 +1209,9 @@ h1 span {
 }
 
 
-/* ==========================================================
+/* ============================================================
    RELIEF MONTAGNE
-   ========================================================== */
+   ============================================================ */
 
 .tile.mountain-mark {
 
@@ -1153,6 +1231,7 @@ h1 span {
         center;
 
     color:
+
         rgba(
             190,
             207,
@@ -1189,15 +1268,18 @@ h1 span {
         translate(
             calc(
                 var(--x)
-                * var(--tile-step)
+                * var(--grid-step)
             ),
+
             calc(
                 var(--y)
-                * var(--tile-step)
+                * var(--grid-step)
             )
         )
 
-        scale(1.06);
+        scale(
+            1.05
+        );
 
     background:
 
@@ -1209,7 +1291,9 @@ h1 span {
 
     filter:
 
-        brightness(1.12)
+        brightness(
+            1.12
+        )
 
         drop-shadow(
             0 0 8px
@@ -1227,9 +1311,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   CENTRE DE LA MONTAGNE
-   ========================================================== */
+/* ============================================================
+   CENTRE MONTAGNE
+   ============================================================ */
 
 .tile.mountain-center {
 
@@ -1244,112 +1328,28 @@ h1 span {
 
     box-shadow:
 
-        inset 0 0 0 2px
+        inset
+        0 0 0 2px
         rgba(
             190,
             210,
             218,
             0.35
-        ),
-
-        0 0 10px
-        rgba(
-            150,
-            175,
-            185,
-            0.18
-        );
-
-    z-index:
-        40;
-
-}
-
-
-.tile.mountain-center:hover {
-
-    background:
-
-        radial-gradient(
-            circle at 35% 30%,
-            #94a9b3,
-            #52646e 52%,
-            #253139 100%
         );
 
 }
 
 
-/* ==========================================================
-   MONTAGNE SÉLECTIONNÉE
-   ========================================================== */
-
-.tile.mountain-tile.selected {
-
-    background:
-
-        linear-gradient(
-            145deg,
-            #9aacb5,
-            #53656f
-        );
-
-    filter:
-
-        brightness(1.25)
-
-        saturate(0.7)
-
-        drop-shadow(
-            0 0 10px
-            rgba(
-                170,
-                195,
-                205,
-                0.7
-            )
-        );
-
-    box-shadow:
-
-        inset 0 0 0 2px
-        rgba(
-            245,
-            250,
-            252,
-            0.95
-        ),
-
-        0 0 18px
-        rgba(
-            170,
-            195,
-            205,
-            0.55
-        );
-
-    z-index:
-        120;
-
-}
-
-
-/* ==========================================================
+/* ============================================================
    OBSTACLES
-   ========================================================== */
+   ============================================================ */
 
 .tile.obstacle {
 
-    background:
-        #303a40;
-
-}
-
-
-.tile.obstacle::before {
-
-    background:
-        #12181d;
+    filter:
+        saturate(
+            0.45
+        );
 
 }
 
@@ -1372,10 +1372,28 @@ h1 span {
         center;
 
     color:
-        #89969d;
+        rgba(
+            255,
+            255,
+            255,
+            0.45
+        );
 
     font-size:
-        19px;
+        15px;
+
+    font-weight:
+        bold;
+
+    text-shadow:
+
+        0 0 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.9
+        );
 
     z-index:
         15;
@@ -1386,9 +1404,9 @@ h1 span {
 }
 
 
-/* ==========================================================
-   MENUS LATÉRAUX
-   ========================================================== */
+/* ============================================================
+   MENUS
+   ============================================================ */
 
 .edge-menu {
 
@@ -1396,48 +1414,28 @@ h1 span {
         fixed;
 
     z-index:
-        200;
+        2000;
 
     background:
 
         rgba(
-            7,
-            13,
-            19,
-            0.97
+            5,
+            10,
+            14,
+            0.94
         );
 
     border:
         1px solid
         var(--border);
 
-    box-shadow:
-
-        0 0 35px
-        rgba(
-            0,
-            0,
-            0,
-            0.65
-        );
-
-    transition:
-
-        transform
-        0.3s
-        cubic-bezier(
-            0.2,
-            0.8,
-            0.2,
-            1
+    backdrop-filter:
+        blur(
+            8px
         );
 
 }
 
-
-/* ==========================================================
-   MENU HAUT
-   ========================================================== */
 
 .menu-top {
 
@@ -1445,47 +1443,25 @@ h1 span {
         0;
 
     left:
-        50%;
-
-    width:
-        min(
-            850px,
-            82vw
-        );
-
-    height:
-        62px;
-
-    transform:
-
-        translate(
-            -50%,
-            calc(
-                -100% +
-                var(--menu-trigger)
-            )
-        );
-
-    border-top:
         0;
 
+    right:
+        0;
+
+    height:
+        var(--menu-height);
+
+    border-top:
+        none;
+
+    border-left:
+        none;
+
+    border-right:
+        none;
+
 }
 
-
-.menu-top:hover {
-
-    transform:
-        translate(
-            -50%,
-            0
-        );
-
-}
-
-
-/* ==========================================================
-   MENU BAS
-   ========================================================== */
 
 .menu-bottom {
 
@@ -1493,137 +1469,69 @@ h1 span {
         0;
 
     left:
-        50%;
-
-    width:
-        min(
-            850px,
-            82vw
-        );
-
-    height:
-        62px;
-
-    transform:
-
-        translate(
-            -50%,
-            calc(
-                100% -
-                var(--menu-trigger)
-            )
-        );
-
-    border-bottom:
         0;
-
-}
-
-
-.menu-bottom:hover {
-
-    transform:
-        translate(
-            -50%,
-            0
-        );
-
-}
-
-
-/* ==========================================================
-   MENU GAUCHE
-   ========================================================== */
-
-.menu-left {
-
-    top:
-        50%;
-
-    left:
-        0;
-
-    width:
-        235px;
-
-    height:
-        390px;
-
-    transform:
-
-        translate(
-            calc(
-                -100% +
-                var(--menu-trigger)
-            ),
-            -50%
-        );
-
-    border-left:
-        0;
-
-}
-
-
-.menu-left:hover {
-
-    transform:
-        translate(
-            0,
-            -50%
-        );
-
-}
-
-
-/* ==========================================================
-   MENU DROITE
-   ========================================================== */
-
-.menu-right {
-
-    top:
-        50%;
 
     right:
         0;
 
-    width:
-        235px;
-
     height:
-        390px;
+        var(--menu-height);
 
-    transform:
+    border-bottom:
+        none;
 
-        translate(
-            calc(
-                100% -
-                var(--menu-trigger)
-            ),
-            -50%
-        );
+    border-left:
+        none;
 
     border-right:
+        none;
+
+}
+
+
+.menu-left {
+
+    left:
         0;
 
-}
+    top:
+        50%;
 
-
-.menu-right:hover {
+    width:
+        var(--menu-width);
 
     transform:
-        translate(
-            0,
-            -50%
-        );
+        translateY(-50%);
+
+    border-left:
+        none;
 
 }
 
 
-/* ==========================================================
-   CONTENU MENUS
-   ========================================================== */
+.menu-right {
+
+    right:
+        0;
+
+    top:
+        50%;
+
+    width:
+        var(--menu-width);
+
+    transform:
+        translateY(-50%);
+
+    border-right:
+        none;
+
+}
+
+
+/* ============================================================
+   MENU INTERNE
+   ============================================================ */
 
 .menu-inner {
 
@@ -1633,25 +1541,28 @@ h1 span {
     height:
         100%;
 
+    padding:
+        7px 12px;
+
     display:
         flex;
 
     align-items:
         center;
 
-    justify-content:
-        space-evenly;
-
     gap:
         8px;
-
-    padding:
-        0 20px;
 
 }
 
 
 .menu-inner.vertical {
+
+    height:
+        auto;
+
+    padding:
+        14px 10px;
 
     flex-direction:
         column;
@@ -1659,35 +1570,29 @@ h1 span {
     align-items:
         stretch;
 
-    justify-content:
-        center;
-
-    gap:
-        10px;
-
-    padding:
-        30px 25px;
-
 }
 
 
-/* ==========================================================
+/* ============================================================
    LOGO
-   ========================================================== */
+   ============================================================ */
 
 .game-logo {
+
+    margin-right:
+        auto;
 
     color:
         var(--text);
 
     font-size:
-        12px;
-
-    font-weight:
-        bold;
+        11px;
 
     letter-spacing:
-        0.08em;
+        0.12em;
+
+    white-space:
+        nowrap;
 
 }
 
@@ -1700,9 +1605,9 @@ h1 span {
 }
 
 
-/* ==========================================================
+/* ============================================================
    BOUTONS
-   ========================================================== */
+   ============================================================ */
 
 button {
 
@@ -1711,16 +1616,16 @@ button {
 
     border:
         1px solid
-        transparent;
+        var(--border);
 
     background:
-        transparent;
+        #0a1218;
 
     color:
         var(--muted);
 
     padding:
-        10px 13px;
+        7px 10px;
 
     font-family:
         inherit;
@@ -1729,13 +1634,24 @@ button {
         8px;
 
     letter-spacing:
-        0.13em;
+        0.08em;
 
     cursor:
         pointer;
 
     transition:
-        all 0.15s ease;
+
+        color
+        0.15s ease,
+
+        border-color
+        0.15s ease,
+
+        background
+        0.15s ease,
+
+        box-shadow
+        0.15s ease;
 
 }
 
@@ -1743,18 +1659,13 @@ button {
 button:hover {
 
     color:
-        var(--p1);
+        var(--text);
 
     border-color:
         var(--border-light);
 
     background:
-        rgba(
-            0,
-            229,
-            255,
-            0.05
-        );
+        #101c24;
 
 }
 
@@ -1762,13 +1673,15 @@ button:hover {
 button.primary {
 
     color:
-        #041016;
-
-    background:
         var(--p1);
 
     border-color:
-        var(--p1);
+
+        color-mix(
+            in srgb,
+            var(--p1) 50%,
+            var(--border)
+        );
 
 }
 
@@ -1776,20 +1689,32 @@ button.primary {
 button.primary:hover {
 
     color:
-        #041016;
+        #ffffff;
 
     background:
-        var(--p2);
+        rgba(
+            0,
+            229,
+            255,
+            0.10
+        );
 
-    border-color:
-        var(--p2);
+    box-shadow:
+
+        0 0 12px
+        rgba(
+            0,
+            229,
+            255,
+            0.15
+        );
 
 }
 
 
-/* ==========================================================
-   MENU TITRE
-   ========================================================== */
+/* ============================================================
+   TITRES MENU
+   ============================================================ */
 
 .menu-title {
 
@@ -1802,19 +1727,15 @@ button.primary:hover {
     letter-spacing:
         0.25em;
 
-    padding-bottom:
-        12px;
-
-    border-bottom:
-        1px solid
-        var(--border);
+    margin-bottom:
+        5px;
 
 }
 
 
-/* ==========================================================
-   PLAYER
-   ========================================================== */
+/* ============================================================
+   JOUEUR
+   ============================================================ */
 
 .player {
 
@@ -1825,10 +1746,20 @@ button.primary:hover {
         center;
 
     gap:
-        12px;
+        8px;
 
     padding:
-        12px 0;
+        8px;
+
+    margin-bottom:
+        5px;
+
+    background:
+        #0c151b;
+
+    border:
+        1px solid
+        var(--border);
 
 }
 
@@ -1836,64 +1767,54 @@ button.primary:hover {
 .player-avatar {
 
     width:
-        42px;
+        28px;
 
     height:
-        42px;
+        28px;
 
     display:
-        grid;
+        flex;
 
-    place-items:
+    align-items:
         center;
 
-    color:
-        var(--p1);
+    justify-content:
+        center;
 
     border:
         1px solid
         var(--p1);
 
+    color:
+        var(--p1);
+
     font-size:
         9px;
 
-    clip-path:
+}
 
-        polygon(
-            29% 0%,
-            71% 0%,
-            100% 29%,
-            100% 71%,
-            71% 100%,
-            29% 100%,
-            0% 71%,
-            0% 29%
-        );
+
+.player-info {
+
+    min-width:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        3px;
 
 }
 
 
 .player-info strong {
 
-    display:
-        block;
-
-    font-size:
-        9px;
-
-}
-
-
-.player-info span {
-
-    display:
-        block;
-
-    margin-top:
-        5px;
-
     color:
-        var(--p2);
+        var(--text);
 
     font-size:
         8px;
@@ -1901,9 +1822,20 @@ button.primary:hover {
 }
 
 
-/* ==========================================================
-   STATUS
-   ========================================================== */
+.player-info span {
+
+    color:
+        var(--p2);
+
+    font-size:
+        7px;
+
+}
+
+
+/* ============================================================
+   STATUS BAS
+   ============================================================ */
 
 .game-status {
 
@@ -1914,10 +1846,13 @@ button.primary:hover {
         center;
 
     gap:
-        8px;
+        7px;
+
+    margin-right:
+        auto;
 
     color:
-        var(--p2);
+        var(--muted);
 
     font-size:
         8px;
@@ -1940,6 +1875,7 @@ button.primary:hover {
         var(--p2);
 
     box-shadow:
+
         0 0 8px
         var(--p2);
 
@@ -1948,14 +1884,20 @@ button.primary:hover {
 
 .stat {
 
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
     color:
         var(--muted);
 
     font-size:
         8px;
-
-    white-space:
-        nowrap;
 
 }
 
@@ -1963,49 +1905,45 @@ button.primary:hover {
 .stat strong {
 
     color:
-        var(--p1);
-
-    font-weight:
-        normal;
+        var(--text);
 
 }
 
 
 .action-status {
 
-    max-width:
+    min-width:
         180px;
 
-    overflow:
-        hidden;
+    justify-content:
+        center;
 
-    text-overflow:
-        ellipsis;
+    color:
+        var(--p1);
 
 }
 
 
-/* ==========================================================
+/* ============================================================
    HINT
-   ========================================================== */
+   ============================================================ */
 
 .hint {
 
     position:
         absolute;
 
-    bottom:
-        clamp(
-            58px,
-            8vh,
-            76px
-        );
-
     left:
         50%;
 
+    bottom:
+        52px;
+
     transform:
         translateX(-50%);
+
+    z-index:
+        1000;
 
     color:
         var(--muted);
@@ -2014,13 +1952,13 @@ button.primary:hover {
         7px;
 
     letter-spacing:
-        0.18em;
+        0.08em;
 
     white-space:
         nowrap;
 
-    z-index:
-        20;
+    pointer-events:
+        none;
 
 }
 
@@ -2033,59 +1971,76 @@ button.primary:hover {
 }
 
 
-/* ==========================================================
+/* ============================================================
    NOTIFICATION
-   ========================================================== */
+   ============================================================ */
 
 .notification {
 
     position:
         fixed;
 
-    top:
-        22px;
-
     left:
         50%;
 
-    z-index:
-        500;
-
-    padding:
-        9px 17px;
-
-    border:
-        1px solid
-        var(--p1);
-
-    background:
-        rgba(
-            5,
-            8,
-            12,
-            0.96
-        );
-
-    color:
-        var(--p1);
-
-    font-size:
-        8px;
+    bottom:
+        72px;
 
     transform:
         translate(
             -50%,
-            -100px
+            20px
         );
 
+    padding:
+        8px 14px;
+
+    background:
+
+        rgba(
+            5,
+            10,
+            14,
+            0.96
+        );
+
+    border:
+        1px solid
+        var(--border-light);
+
+    color:
+        var(--text);
+
+    font-size:
+        8px;
+
+    letter-spacing:
+        0.08em;
+
+    opacity:
+        0;
+
+    pointer-events:
+        none;
+
+    z-index:
+        3000;
+
     transition:
+
+        opacity
+        0.2s ease,
+
         transform
-        0.25s ease;
+        0.2s ease;
 
 }
 
 
-.notification.visible {
+.notification.show {
+
+    opacity:
+        1;
 
     transform:
         translate(
@@ -2096,19 +2051,24 @@ button.primary:hover {
 }
 
 
-/* ==========================================================
-   PETITS ÉCRANS
-   ========================================================== */
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 
-@media (max-width: 700px) {
+@media (
+    max-width: 900px
+) {
 
-    .board {
+    :root {
 
         --board-size:
             min(
-                70vh,
-                82vw
+                68vh,
+                68vw
             );
+
+        --menu-width:
+            125px;
 
     }
 
@@ -2116,7 +2076,65 @@ button.primary:hover {
     .game-header {
 
         width:
-            82vw;
+            62vw;
+
+    }
+
+}
+
+
+@media (
+    max-width: 700px
+) {
+
+    :root {
+
+        --board-size:
+            min(
+                64vh,
+                76vw
+            );
+
+        --menu-width:
+            105px;
+
+    }
+
+
+    .game-header {
+
+        width:
+            58vw;
+
+        top:
+            52px;
+
+    }
+
+
+    .menu-inner {
+
+        gap:
+            4px;
+
+    }
+
+
+    .menu-inner > button {
+
+        padding:
+            6px;
+
+        font-size:
+            7px;
+
+    }
+
+
+    .game-logo {
+
+        font-size:
+            8px;
 
     }
 
@@ -2125,42 +2143,80 @@ button.primary:hover {
     .menu-right {
 
         width:
-            180px;
+            var(--menu-width);
 
     }
 
 
     .action-status {
 
-        display:
-            none;
+        min-width:
+            100px;
 
     }
 
 }
 
 
-/* ==========================================================
-   ÉCRANS BAS
-   ========================================================== */
+@media (
+    max-width: 520px
+) {
 
-@media (max-height: 650px) {
-
-    .board {
+    :root {
 
         --board-size:
             min(
-                68vh,
-                76vw
+                58vh,
+                82vw
             );
+
+        --menu-width:
+            88px;
 
     }
 
 
     .game-header {
 
-        top:
-            50px;
+        width:
+            54vw;
+
+    }
+
+
+    .game-header h1 {
+
+        font-size:
+            16px;
+
+    }
+
+
+    .coordinates {
+
+        font-size:
+            7px;
+
+    }
+
+
+    .menu-top button,
+    .menu-bottom button {
+
+        font-size:
+            6px;
+
+        padding:
+            5px 6px;
+
+    }
+
+
+    .menu-left,
+    .menu-right {
+
+        opacity:
+            0.92;
 
     }
 
@@ -2168,59 +2224,10 @@ button.primary:hover {
     .hint {
 
         bottom:
-            52px;
+            48px;
 
-    }
-
-}
-
-
-/* ==========================================================
-   TRÈS PETITS ÉCRANS
-   ========================================================== */
-
-@media (max-width: 480px) {
-
-    .board {
-
-        --board-size:
-            min(
-                66vh,
-                88vw
-            );
-
-    }
-
-
-    .menu-left,
-    .menu-right {
-
-        width:
-            155px;
-
-    }
-
-
-    .menu-inner.vertical {
-
-        padding:
-            25px 18px;
-
-    }
-
-
-    .game-header {
-
-        width:
-            88vw;
-
-    }
-
-
-    .coordinates {
-
-        display:
-            none;
+        font-size:
+            6px;
 
     }
 
