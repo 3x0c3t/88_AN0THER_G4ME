@@ -1,17 +1,18 @@
 /* ============================================================
    88_AN0THER_G4ME
    OCTO GRID
-   Version v1.0
+   v1.0
 
-   Grille :
-   - 8 joueurs maximum
+   MAP :
+   - plateau circulaire
    - 8 secteurs de 45°
-   - grille continue
-   - cellules octogonales adjacentes
+   - 8 joueurs
+   - rotation libre du plateau
    - montagne centrale 3 x 3
    ============================================================ */
 
 "use strict";
+
 
 /* ============================================================
    CONFIGURATION
@@ -21,36 +22,63 @@ const PLAYERS = 8;
 
 const GRID_RADIUS = 7;
 
-const TILE_SIZE = 42;
-const TILE_STEP = 40;
-
-const SECTOR_OFFSET = -90;
+const SECTOR_ANGLE = 360 / PLAYERS;
 
 const CENTER_PLAYER = 0;
 
 
 /* ============================================================
-   ÉTAT DU JEU
+   ÉTAT
    ============================================================ */
 
 let currentPlayer = 1;
+
 let turn = 1;
+
 let score = 0;
 
 let selectedTile = null;
-let gameStarted = true;
 
 let tiles = [];
+
+
+/* ============================================================
+   ROTATION
+   ============================================================ */
+
+let boardRotation = 0;
+
+let isRotating = false;
+
+let rotationStartAngle = 0;
+
+let rotationStartValue = 0;
+
+let pointerStartX = 0;
+
+let pointerStartY = 0;
+
+let hasDragged = false;
+
+
+/*
+ * Distance minimale avant de considérer
+ * le mouvement comme une rotation.
+ */
+const ROTATION_THRESHOLD = 5;
 
 
 /* ============================================================
    DOM
    ============================================================ */
 
-const board = document.getElementById("board");
+const board =
+    document.getElementById("board");
 
 const notification =
-    document.getElementById("notification");
+    document.getElementById(
+        "notification"
+    );
 
 const turnDisplay =
     document.getElementById("turn");
@@ -58,31 +86,17 @@ const turnDisplay =
 const scoreDisplay =
     document.getElementById("score");
 
-/*
- * #action n'existe pas actuellement dans le HTML.
- * On protège donc toutes les utilisations.
- */
 const actionDisplay =
     document.getElementById("action");
 
-const endTurnButton =
-    document.getElementById("end-turn");
-
-const resetButton =
-    document.getElementById("reset-game");
-
-const newGameButton =
-    document.getElementById("new-game");
-
-const saveButton =
-    document.getElementById("save-game");
-
-const settingsButton =
-    document.getElementById("settings");
+const coordinatesDisplay =
+    document.getElementById(
+        "coordinates"
+    );
 
 
 /* ============================================================
-   COULEURS JOUEURS
+   COULEURS
    ============================================================ */
 
 const PLAYER_COLORS = {
@@ -104,32 +118,6 @@ const PLAYER_COLORS = {
     8: "#3d8bff"
 
 };
-
-
-/* ============================================================
-   MONTAGNE CENTRALE
-   ============================================================ */
-
-/*
- * La montagne occupe les 9 cellules autour du centre :
- *
- *     M M M
- *     M M M
- *     M M M
- *
- * Le centre est donc inclus.
- */
-
-function isMountainTile(x, y) {
-
-    return (
-        Math.max(
-            Math.abs(x),
-            Math.abs(y)
-        ) <= 1
-    );
-
-}
 
 
 /* ============================================================
@@ -190,165 +178,202 @@ const OBSTACLES = [
 
 
 /* ============================================================
-   UTILITAIRES
+   MONTAGNE CENTRALE
    ============================================================ */
 
-function clamp(value, min, max) {
+function isMountainTile(x, y) {
 
-    return Math.max(
-        min,
-        Math.min(max, value)
+    return (
+
+        Math.max(
+            Math.abs(x),
+            Math.abs(y)
+        ) <= 1
+
     );
 
 }
 
+
+/* ============================================================
+   DISTANCE
+   ============================================================ */
 
 function distanceFromCenter(x, y) {
 
     return Math.sqrt(
-        (x * x) +
-        (y * y)
+        x * x +
+        y * y
     );
 
 }
 
 
 /* ============================================================
-   ACTION DISPLAY
-   ============================================================ */
-
-function setActionDisplay(message) {
-
-    if (!actionDisplay) {
-        return;
-    }
-
-    actionDisplay.textContent = message;
-
-}
-
-
-/* ============================================================
-   DÉTERMINATION DU SECTEUR
-   ============================================================ */
-
-function getPlayerFromPosition(x, y) {
-
-    /*
-     * La montagne centrale n'appartient à aucun joueur.
-     */
-    if (isMountainTile(x, y)) {
-        return CENTER_PLAYER;
-    }
-
-    let angle =
-        Math.atan2(y, x) *
-        180 /
-        Math.PI;
-
-    angle -= SECTOR_OFFSET;
-
-    while (angle < 0) {
-        angle += 360;
-    }
-
-    while (angle >= 360) {
-        angle -= 360;
-    }
-
-    const sector =
-        Math.floor(angle / 45);
-
-    return (
-        (sector % PLAYERS) +
-        1
-    );
-
-}
-
-
-/* ============================================================
-   TEST APPARTENANCE À LA GRILLE
+   APPARTENANCE AU PLATEAU
    ============================================================ */
 
 function isInsideBoard(x, y) {
 
-    const distance =
-        distanceFromCenter(x, y);
-
     return (
-        distance <=
+
+        distanceFromCenter(x, y)
+        <=
         GRID_RADIUS + 0.35
+
     );
 
 }
 
 
 /* ============================================================
-   CRÉATION D'UNE CELLULE
+   DÉTERMINATION DU JOUEUR
    ============================================================ */
 
-function createTile(x, y) {
+function getPlayerFromPosition(
+    x,
+    y
+) {
+
+    if (
+        isMountainTile(x, y)
+    ) {
+
+        return CENTER_PLAYER;
+
+    }
+
+
+    let angle =
+        Math.atan2(y, x)
+        *
+        180
+        /
+        Math.PI;
+
+
+    /*
+     * Rotation logique initiale.
+     *
+     * Le premier secteur commence
+     * vers le haut.
+     */
+    angle += 90;
+
+
+    while (
+        angle < 0
+    ) {
+
+        angle += 360;
+
+    }
+
+
+    while (
+        angle >= 360
+    ) {
+
+        angle -= 360;
+
+    }
+
+
+    const sector =
+        Math.floor(
+            angle /
+            SECTOR_ANGLE
+        );
+
+
+    return (
+        sector + 1
+    );
+
+}
+
+
+/* ============================================================
+   CRÉATION CELLULE
+   ============================================================ */
+
+function createTile(
+    x,
+    y
+) {
 
     const tile =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    tile.className = "tile";
 
-    const mountain =
-        isMountainTile(x, y);
+    tile.className =
+        "tile";
 
-    const player =
-        mountain
-            ? CENTER_PLAYER
-            : getPlayerFromPosition(x, y);
 
-    tile.dataset.x = x;
+    tile.dataset.x =
+        String(x);
 
-    tile.dataset.y = y;
 
-    tile.dataset.player = player;
+    tile.dataset.y =
+        String(y);
+
 
     tile.style.setProperty(
         "--x",
-        `${x * TILE_STEP}px`
+        String(x)
     );
+
 
     tile.style.setProperty(
         "--y",
-        `${y * TILE_STEP}px`
+        String(y)
     );
 
 
-    /* ========================================================
-       MONTAGNE
-       ======================================================== */
-
-    if (mountain) {
+    /*
+     * MONTAGNE
+     */
+    if (
+        isMountainTile(x, y)
+    ) {
 
         tile.classList.add(
             "mountain-tile"
         );
 
-        tile.dataset.mountain = "true";
 
-        /*
-         * Le centre est le cœur de la montagne.
-         */
-        if (x === 0 && y === 0) {
+        tile.dataset.player =
+            String(CENTER_PLAYER);
+
+
+        tile.dataset.mountain =
+            "true";
+
+
+        if (
+            x === 0 &&
+            y === 0
+        ) {
 
             tile.classList.add(
                 "mountain-center"
             );
 
+
             tile.innerHTML = `
-                <span class="mountain-mark">8</span>
+                <span class="mountain-mark">
+                    ◆
+                </span>
             `;
 
         } else {
 
             tile.innerHTML = `
-                <span class="mountain-mark">◆</span>
+                <span class="mountain-mark">
+                    ◇
+                </span>
             `;
 
         }
@@ -356,20 +381,32 @@ function createTile(x, y) {
     }
 
 
-    /* ========================================================
-       TERRAIN JOUEUR
-       ======================================================== */
-
+    /*
+     * TERRAIN JOUEUR
+     */
     else {
+
+        const player =
+            getPlayerFromPosition(
+                x,
+                y
+            );
+
+
+        tile.dataset.player =
+            String(player);
+
 
         tile.classList.add(
             `player-${player}`
         );
 
+
         tile.style.setProperty(
             "--player-color",
             PLAYER_COLORS[player]
         );
+
 
         tile.innerHTML = `
             <span class="tile-number">
@@ -380,10 +417,9 @@ function createTile(x, y) {
     }
 
 
-    /* ========================================================
-       OBSTACLE
-       ======================================================== */
-
+    /*
+     * OBSTACLE
+     */
     const obstacle =
         OBSTACLES.find(
             item =>
@@ -391,61 +427,79 @@ function createTile(x, y) {
                 item.y === y
         );
 
+
     if (obstacle) {
 
         tile.classList.add(
             "obstacle"
         );
 
+
         tile.dataset.obstacle =
             "true";
 
+
         tile.innerHTML = `
-            <span class="obstacle-mark">×</span>
+            <span class="obstacle-mark">
+                ×
+            </span>
         `;
 
     }
 
 
-    /* ========================================================
-       INTERACTION
-       ======================================================== */
-
+    /*
+     * ÉVÉNEMENTS
+     */
     tile.addEventListener(
         "click",
         handleTileClick
     );
+
 
     tile.addEventListener(
         "mouseenter",
         handleTileEnter
     );
 
+
     tile.addEventListener(
         "mouseleave",
         handleTileLeave
     );
 
-    board.appendChild(tile);
 
-    tiles.push(tile);
+    board.appendChild(
+        tile
+    );
+
+
+    tiles.push(
+        tile
+    );
 
 }
 
 
 /* ============================================================
-   CRÉATION DE LA GRILLE
+   CRÉATION PLATEAU
    ============================================================ */
 
 function createBoard() {
 
     if (!board) {
+
         return;
+
     }
 
-    board.innerHTML = "";
+
+    board.innerHTML =
+        "";
+
 
     tiles = [];
+
 
     for (
         let y = -GRID_RADIUS;
@@ -459,28 +513,269 @@ function createBoard() {
             x++
         ) {
 
-            if (!isInsideBoard(x, y)) {
+            if (
+                !isInsideBoard(
+                    x,
+                    y
+                )
+            ) {
+
                 continue;
+
             }
 
-            createTile(x, y);
+
+            createTile(
+                x,
+                y
+            );
 
         }
 
     }
 
 
-    /*
-     * Sécurité : le centre doit toujours exister.
-     */
-    if (
-        !tiles.some(tile =>
-            Number(tile.dataset.x) === 0 &&
-            Number(tile.dataset.y) === 0
+    updateBoardRotation();
+
+}
+
+
+/* ============================================================
+   ROTATION VISUELLE
+   ============================================================ */
+
+function updateBoardRotation() {
+
+    if (!board) {
+
+        return;
+
+    }
+
+
+    board.style.setProperty(
+        "--board-rotation",
+        `${boardRotation}deg`
+    );
+
+}
+
+
+/* ============================================================
+   ANGLE D'UN POINT AUTOUR DU CENTRE
+   ============================================================ */
+
+function getPointerAngle(
+    event
+) {
+
+    const rect =
+        board.getBoundingClientRect();
+
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+
+    return (
+
+        Math.atan2(
+            event.clientY - centerY,
+            event.clientX - centerX
         )
+
+        *
+
+        180
+        /
+        Math.PI
+
+    );
+
+}
+
+
+/* ============================================================
+   DÉBUT ROTATION
+   ============================================================ */
+
+function handlePointerDown(
+    event
+) {
+
+    if (
+        event.button !== 0
     ) {
 
-        createTile(0, 0);
+        return;
+
+    }
+
+
+    isRotating = true;
+
+    hasDragged = false;
+
+    pointerStartX =
+        event.clientX;
+
+    pointerStartY =
+        event.clientY;
+
+
+    rotationStartAngle =
+        getPointerAngle(
+            event
+        );
+
+
+    rotationStartValue =
+        boardRotation;
+
+
+    board.classList.add(
+        "is-rotating"
+    );
+
+
+    board.setPointerCapture(
+        event.pointerId
+    );
+
+}
+
+
+/* ============================================================
+   ROTATION
+   ============================================================ */
+
+function handlePointerMove(
+    event
+) {
+
+    if (
+        !isRotating
+    ) {
+
+        return;
+
+    }
+
+
+    const dx =
+        event.clientX -
+        pointerStartX;
+
+
+    const dy =
+        event.clientY -
+        pointerStartY;
+
+
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+
+    if (
+        distance >
+        ROTATION_THRESHOLD
+    ) {
+
+        hasDragged = true;
+
+    }
+
+
+    const currentAngle =
+        getPointerAngle(
+            event
+        );
+
+
+    let delta =
+        currentAngle -
+        rotationStartAngle;
+
+
+    /*
+     * Corrige le passage
+     * +180 / -180.
+     */
+    if (
+        delta > 180
+    ) {
+
+        delta -= 360;
+
+    }
+
+
+    if (
+        delta < -180
+    ) {
+
+        delta += 360;
+
+    }
+
+
+    boardRotation =
+        rotationStartValue +
+        delta;
+
+
+    updateBoardRotation();
+
+}
+
+
+/* ============================================================
+   FIN ROTATION
+   ============================================================ */
+
+function handlePointerUp(
+    event
+) {
+
+    if (
+        !isRotating
+    ) {
+
+        return;
+
+    }
+
+
+    isRotating = false;
+
+
+    board.classList.remove(
+        "is-rotating"
+    );
+
+
+    try {
+
+        board.releasePointerCapture(
+            event.pointerId
+        );
+
+    } catch (
+        error
+    ) {
+
+        /*
+         * Rien à faire.
+         */
 
     }
 
@@ -491,49 +786,84 @@ function createBoard() {
    CLICK CELLULE
    ============================================================ */
 
-function handleTileClick(event) {
+function handleTileClick(
+    event
+) {
 
-    const tile =
-        event.currentTarget;
-
-    const x =
-        Number(tile.dataset.x);
-
-    const y =
-        Number(tile.dataset.y);
-
-    const player =
-        Number(tile.dataset.player);
-
-
-    /* ========================================================
-       MONTAGNE
-       ======================================================== */
-
+    /*
+     * Si le clic vient d'un drag,
+     * on ne sélectionne pas la cellule.
+     */
     if (
-        tile.dataset.mountain ===
-        "true"
+        hasDragged
     ) {
 
-        selectTile(tile);
-
-        setActionDisplay(
-            `MOUNTAIN X${x} Y${y}`
-        );
-
-        showNotification(
-            "CENTRAL MOUNTAIN"
-        );
+        hasDragged = false;
 
         return;
 
     }
 
 
-    /* ========================================================
-       OBSTACLE
-       ======================================================== */
+    const tile =
+        event.currentTarget;
 
+
+    const x =
+        Number(
+            tile.dataset.x
+        );
+
+
+    const y =
+        Number(
+            tile.dataset.y
+        );
+
+
+    const player =
+        Number(
+            tile.dataset.player
+        );
+
+
+    updateCoordinates(
+        x,
+        y
+    );
+
+
+    /*
+     * MONTAGNE
+     */
+    if (
+        tile.dataset.mountain ===
+        "true"
+    ) {
+
+        selectTile(
+            tile
+        );
+
+
+        setAction(
+            `MOUNTAIN · X${x} · Y${y}`
+        );
+
+
+        showNotification(
+            "CENTRAL MOUNTAIN"
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+     * OBSTACLE
+     */
     if (
         tile.dataset.obstacle ===
         "true"
@@ -543,27 +873,33 @@ function handleTileClick(event) {
             "TILE BLOCKED"
         );
 
+
         return;
 
     }
 
 
-    /* ========================================================
-       SÉLECTION
-       ======================================================== */
+    /*
+     * SÉLECTION
+     */
+    selectTile(
+        tile
+    );
 
-    selectTile(tile);
 
     score += 10;
 
+
     updateScore();
 
-    setActionDisplay(
-        `P${currentPlayer} SELECTED X${x} Y${y}`
+
+    setAction(
+        `P${player} · X${x} · Y${y}`
     );
 
+
     showNotification(
-        `PLAYER ${currentPlayer} → TILE P${player} [${x}, ${y}]`
+        `PLAYER ${currentPlayer} → P${player}`
     );
 
 }
@@ -573,9 +909,13 @@ function handleTileClick(event) {
    SÉLECTION
    ============================================================ */
 
-function selectTile(tile) {
+function selectTile(
+    tile
+) {
 
-    if (selectedTile) {
+    if (
+        selectedTile
+    ) {
 
         selectedTile.classList.remove(
             "selected"
@@ -583,9 +923,14 @@ function selectTile(tile) {
 
     }
 
-    selectedTile = tile;
 
-    if (selectedTile) {
+    selectedTile =
+        tile;
+
+
+    if (
+        selectedTile
+    ) {
 
         selectedTile.classList.add(
             "selected"
@@ -597,19 +942,42 @@ function selectTile(tile) {
 
 
 /* ============================================================
-   SURVOL
+   HOVER
    ============================================================ */
 
-function handleTileEnter(event) {
+function handleTileEnter(
+    event
+) {
+
+    if (
+        isRotating
+    ) {
+
+        return;
+
+    }
+
 
     const tile =
         event.currentTarget;
 
+
     const x =
-        tile.dataset.x;
+        Number(
+            tile.dataset.x
+        );
+
 
     const y =
-        tile.dataset.y;
+        Number(
+            tile.dataset.y
+        );
+
+
+    updateCoordinates(
+        x,
+        y
+    );
 
 
     if (
@@ -617,9 +985,10 @@ function handleTileEnter(event) {
         "true"
     ) {
 
-        setActionDisplay(
+        setAction(
             `MOUNTAIN · X${x} · Y${y}`
         );
+
 
         return;
 
@@ -629,47 +998,114 @@ function handleTileEnter(event) {
     const player =
         tile.dataset.player;
 
-    setActionDisplay(
-        `P${player} · X${x} · Y${y}`
+
+    setAction(
+        `PLAYER ${player} · X${x} · Y${y}`
     );
 
 }
 
 
+/* ============================================================
+   FIN HOVER
+   ============================================================ */
+
 function handleTileLeave() {
 
-    if (selectedTile) {
+    if (
+        selectedTile
+    ) {
 
         const x =
             selectedTile.dataset.x;
 
+
         const y =
             selectedTile.dataset.y;
+
 
         if (
             selectedTile.dataset.mountain ===
             "true"
         ) {
 
-            setActionDisplay(
-                `MOUNTAIN X${x} Y${y}`
+            setAction(
+                `MOUNTAIN · X${x} · Y${y}`
             );
 
         } else {
 
-            setActionDisplay(
-                `SELECTED X${x} Y${y}`
+            setAction(
+                `SELECTED · X${x} · Y${y}`
             );
 
         }
 
-    } else {
 
-        setActionDisplay(
-            "SELECT A TILE"
-        );
+        return;
 
     }
+
+
+    setAction(
+        "SELECT A TILE"
+    );
+
+}
+
+
+/* ============================================================
+   COORDONNÉES
+   ============================================================ */
+
+function updateCoordinates(
+    x,
+    y
+) {
+
+    if (
+        !coordinatesDisplay
+    ) {
+
+        return;
+
+    }
+
+
+    const format =
+        value =>
+            String(value)
+                .padStart(
+                    2,
+                    "0"
+                );
+
+
+    coordinatesDisplay.innerHTML =
+        `X: ${format(x)}&nbsp;&nbsp;Y: ${format(y)}`;
+
+}
+
+
+/* ============================================================
+   ACTION
+   ============================================================ */
+
+function setAction(
+    message
+) {
+
+    if (
+        !actionDisplay
+    ) {
+
+        return;
+
+    }
+
+
+    actionDisplay.textContent =
+        message;
 
 }
 
@@ -682,24 +1118,32 @@ function endTurn() {
 
     currentPlayer++;
 
+
     if (
         currentPlayer >
         PLAYERS
     ) {
 
-        currentPlayer = 1;
+        currentPlayer =
+            1;
 
         turn++;
 
     }
 
+
     updateTurn();
 
-    selectTile(null);
 
-    setActionDisplay(
+    selectTile(
+        null
+    );
+
+
+    setAction(
         "SELECT A TILE"
     );
+
 
     showNotification(
         `PLAYER ${currentPlayer} TURN`
@@ -714,25 +1158,39 @@ function endTurn() {
 
 function newGame() {
 
-    currentPlayer = 1;
+    currentPlayer =
+        1;
 
-    turn = 1;
+    turn =
+        1;
 
-    score = 0;
+    score =
+        0;
 
-    selectedTile = null;
+    selectedTile =
+        null;
 
-    gameStarted = true;
+    boardRotation =
+        0;
+
 
     createBoard();
+
 
     updateTurn();
 
     updateScore();
 
-    setActionDisplay(
+    updateCoordinates(
+        0,
+        0
+    );
+
+
+    setAction(
         "SELECT A TILE"
     );
+
 
     showNotification(
         "NEW GAME STARTED"
@@ -747,23 +1205,40 @@ function newGame() {
 
 function resetGame() {
 
-    currentPlayer = 1;
+    currentPlayer =
+        1;
 
-    turn = 1;
+    turn =
+        1;
 
-    score = 0;
+    score =
+        0;
 
-    selectedTile = null;
+    selectedTile =
+        null;
+
+    boardRotation =
+        0;
+
 
     createBoard();
+
 
     updateTurn();
 
     updateScore();
 
-    setActionDisplay(
+
+    updateCoordinates(
+        0,
+        0
+    );
+
+
+    setAction(
         "SELECT A TILE"
     );
+
 
     showNotification(
         "GAME RESET"
@@ -778,15 +1253,21 @@ function resetGame() {
 
 function updateScore() {
 
-    if (!scoreDisplay) {
+    if (
+        !scoreDisplay
+    ) {
+
         return;
+
     }
 
+
     scoreDisplay.textContent =
-        String(score).padStart(
-            3,
-            "0"
-        );
+        String(score)
+            .padStart(
+                3,
+                "0"
+            );
 
 }
 
@@ -797,43 +1278,34 @@ function updateScore() {
 
 function updateTurn() {
 
-    if (turnDisplay) {
+    if (
+        turnDisplay
+    ) {
 
         turnDisplay.textContent =
-            String(turn).padStart(
-                2,
-                "0"
-            );
+            String(turn)
+                .padStart(
+                    2,
+                    "0"
+                );
 
     }
 
 
-    const playerLabels =
-        document.querySelectorAll(
-            ".player-number"
+    const player =
+        document.querySelector(
+            ".player-info strong"
         );
 
-    playerLabels.forEach(
-        label => {
 
-            label.classList.remove(
-                "active"
-            );
+    if (
+        player
+    ) {
 
-            if (
-                Number(
-                    label.dataset.player
-                ) === currentPlayer
-            ) {
+        player.textContent =
+            `PLAYER ${String(currentPlayer).padStart(2, "0")}`;
 
-                label.classList.add(
-                    "active"
-                );
-
-            }
-
-        }
-    );
+    }
 
 }
 
@@ -842,22 +1314,32 @@ function updateTurn() {
    NOTIFICATION
    ============================================================ */
 
-function showNotification(message) {
+function showNotification(
+    message
+) {
 
-    if (!notification) {
+    if (
+        !notification
+    ) {
+
         return;
+
     }
+
 
     notification.textContent =
         message;
+
 
     notification.classList.add(
         "visible"
     );
 
+
     clearTimeout(
         notification._timer
     );
+
 
     notification._timer =
         setTimeout(
@@ -875,7 +1357,7 @@ function showNotification(message) {
 
 
 /* ============================================================
-   SAUVEGARDE LOCALE
+   SAUVEGARDE
    ============================================================ */
 
 function saveGame() {
@@ -888,9 +1370,14 @@ function saveGame() {
 
         score,
 
+        boardRotation,
+
         selectedTile:
+
             selectedTile
+
                 ? {
+
                     x:
                         Number(
                             selectedTile.dataset.x
@@ -900,7 +1387,9 @@ function saveGame() {
                         Number(
                             selectedTile.dataset.y
                         )
+
                 }
+
                 : null,
 
         savedAt:
@@ -933,11 +1422,15 @@ function loadGame() {
             "88_AN0THER_G4ME_SAVE"
         );
 
-    if (!saved) {
+
+    if (
+        !saved
+    ) {
 
         showNotification(
             "NO SAVE FOUND"
         );
+
 
         return;
 
@@ -947,18 +1440,20 @@ function loadGame() {
     try {
 
         const data =
-            JSON.parse(saved);
+            JSON.parse(
+                saved
+            );
 
 
         currentPlayer =
-            clamp(
-                Number(
-                    data.currentPlayer
-                ) || 1,
-
+            Math.max(
                 1,
-
-                PLAYERS
+                Math.min(
+                    PLAYERS,
+                    Number(
+                        data.currentPlayer
+                    ) || 1
+                )
             );
 
 
@@ -980,23 +1475,32 @@ function loadGame() {
             );
 
 
+        boardRotation =
+            Number(
+                data.boardRotation
+            ) || 0;
+
+
         createBoard();
+
 
         updateTurn();
 
         updateScore();
 
-        selectTile(null);
+        updateBoardRotation();
 
 
-        if (data.selectedTile) {
+        if (
+            data.selectedTile
+        ) {
 
             const tile =
                 tiles.find(
-                    tile =>
+                    item =>
 
                         Number(
-                            tile.dataset.x
+                            item.dataset.x
                         ) ===
                         Number(
                             data.selectedTile.x
@@ -1005,7 +1509,7 @@ function loadGame() {
                         &&
 
                         Number(
-                            tile.dataset.y
+                            item.dataset.y
                         ) ===
                         Number(
                             data.selectedTile.y
@@ -1013,9 +1517,13 @@ function loadGame() {
                 );
 
 
-            if (tile) {
+            if (
+                tile
+            ) {
 
-                selectTile(tile);
+                selectTile(
+                    tile
+                );
 
             }
 
@@ -1027,9 +1535,14 @@ function loadGame() {
         );
 
 
-    } catch (error) {
+    } catch (
+        error
+    ) {
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         showNotification(
             "INVALID SAVE"
@@ -1041,16 +1554,161 @@ function loadGame() {
 
 
 /* ============================================================
-   SETTINGS
+   BOUTONS DES MENUS
    ============================================================ */
 
-function openSettings() {
+document.addEventListener(
+    "click",
+    event => {
 
-    showNotification(
-        "SETTINGS NOT AVAILABLE IN v1.0"
-    );
+        const button =
+            event.target.closest(
+                "button[data-action]"
+            );
 
-}
+
+        if (
+            !button
+        ) {
+
+            return;
+
+        }
+
+
+        const action =
+            button.dataset.action;
+
+
+        switch (
+            action
+        ) {
+
+            case "new":
+
+                newGame();
+
+                break;
+
+
+            case "save":
+
+                saveGame();
+
+                break;
+
+
+            case "settings":
+
+                showNotification(
+                    "SETTINGS v1.0"
+                );
+
+                break;
+
+
+            case "end":
+
+                endTurn();
+
+                break;
+
+
+            case "reset":
+
+                resetGame();
+
+                break;
+
+
+            case "action":
+
+                if (
+                    selectedTile
+                ) {
+
+                    showNotification(
+                        "ACTION ON SELECTED TILE"
+                    );
+
+                } else {
+
+                    showNotification(
+                        "SELECT A TILE FIRST"
+                    );
+
+                }
+
+                break;
+
+
+            case "inventory":
+
+                showNotification(
+                    "INVENTORY"
+                );
+
+                break;
+
+
+            case "map":
+
+                showNotification(
+                    "MAP ACTIVE"
+                );
+
+                break;
+
+
+            case "stats":
+
+                showNotification(
+                    `SCORE ${score}`
+                );
+
+                break;
+
+
+            case "help":
+
+                showNotification(
+                    "DRAG MAP TO ROTATE"
+                );
+
+                break;
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   ROTATION SOURIS / TOUCH
+   ============================================================ */
+
+board.addEventListener(
+    "pointerdown",
+    handlePointerDown
+);
+
+
+board.addEventListener(
+    "pointermove",
+    handlePointerMove
+);
+
+
+board.addEventListener(
+    "pointerup",
+    handlePointerUp
+);
+
+
+board.addEventListener(
+    "pointercancel",
+    handlePointerUp
+);
 
 
 /* ============================================================
@@ -1097,11 +1755,31 @@ document.addEventListener(
 
             case "escape":
 
-                selectTile(null);
+                selectTile(
+                    null
+                );
 
-                setActionDisplay(
+                setAction(
                     "SELECT A TILE"
                 );
+
+                break;
+
+
+            case "arrowleft":
+
+                boardRotation -= 5;
+
+                updateBoardRotation();
+
+                break;
+
+
+            case "arrowright":
+
+                boardRotation += 5;
+
+                updateBoardRotation();
 
                 break;
 
@@ -1109,60 +1787,6 @@ document.addEventListener(
 
     }
 );
-
-
-/* ============================================================
-   BOUTONS
-   ============================================================ */
-
-if (endTurnButton) {
-
-    endTurnButton.addEventListener(
-        "click",
-        endTurn
-    );
-
-}
-
-
-if (resetButton) {
-
-    resetButton.addEventListener(
-        "click",
-        resetGame
-    );
-
-}
-
-
-if (newGameButton) {
-
-    newGameButton.addEventListener(
-        "click",
-        newGame
-    );
-
-}
-
-
-if (saveButton) {
-
-    saveButton.addEventListener(
-        "click",
-        saveGame
-    );
-
-}
-
-
-if (settingsButton) {
-
-    settingsButton.addEventListener(
-        "click",
-        openSettings
-    );
-
-}
 
 
 /* ============================================================
@@ -1175,11 +1799,20 @@ updateTurn();
 
 updateScore();
 
-setActionDisplay(
+updateCoordinates(
+    0,
+    0
+);
+
+setAction(
     "SELECT A TILE"
 );
 
 
 console.log(
-    "88_AN0THER_G4ME v1.0 initialized"
+    "88_AN0THER_G4ME v1.0"
+);
+
+console.log(
+    "8 secteurs · plateau circulaire · rotation libre"
 );
