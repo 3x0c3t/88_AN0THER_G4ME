@@ -1,697 +1,725 @@
-/* ==========================================================
+/* ============================================================
    88_AN0THER_G4ME
-   INDEX.JS
-   ========================================================== */
+   OCTO GRID
+   Version v1.0
 
+   Grille :
+   - 8 joueurs maximum
+   - 8 secteurs de 45°
+   - grille continue
+   - cellules octogonales adjacentes
+   - centre commun
+   ============================================================ */
 
-/* ==========================================================
-   CONFIGURATION DU PLATEAU
-   ========================================================== */
+"use strict";
+
+/* ============================================================
+   CONFIGURATION
+   ============================================================ */
 
 const PLAYERS = 8;
 
-const RINGS = 5;
+const GRID_RADIUS = 7;
 
-const TILES_PER_RING = [
-    1,
-    2,
-    3,
-    4,
-    5
-];
+const TILE_SIZE = 42;
+const TILE_STEP = 40;
+
+const SECTOR_OFFSET = -90;
 
 const CENTER_PLAYER = 0;
 
 
-/* ==========================================================
+/* ============================================================
+   ÉTAT DU JEU
+   ============================================================ */
+
+let currentPlayer = 1;
+let turn = 1;
+let score = 0;
+
+let selectedTile = null;
+let gameStarted = true;
+
+let tiles = [];
+
+
+/* ============================================================
    DOM
-   ========================================================== */
+   ============================================================ */
 
 const board = document.getElementById("board");
-const scoreElement = document.getElementById("score");
-const turnElement = document.getElementById("turn");
-const coordinatesElement = document.getElementById("coordinates");
+
 const notification = document.getElementById("notification");
 
+const turnDisplay = document.getElementById("turn");
+const scoreDisplay = document.getElementById("score");
 
-/* ==========================================================
-   ÉTAT DU JEU
-   ========================================================== */
+const actionDisplay = document.getElementById("action");
 
-let score = 0;
-let turn = 1;
-let selectedTile = null;
+const endTurnButton = document.getElementById("end-turn");
+const resetButton = document.getElementById("reset-game");
 
-
-/* ==========================================================
-   JOUEURS
-   ========================================================== */
-
-const playerColors = [
-    "cyan",
-    "green",
-    "orange",
-    "red",
-    "violet",
-    "blue",
-    "yellow",
-    "pink"
-];
+const newGameButton = document.getElementById("new-game");
+const saveButton = document.getElementById("save-game");
+const settingsButton = document.getElementById("settings");
 
 
-/* ==========================================================
+/* ============================================================
+   COULEURS JOUEURS
+   ============================================================ */
+
+const PLAYER_COLORS = {
+    1: "#00e5ff",
+    2: "#00ff99",
+    3: "#ffe600",
+    4: "#ff9d00",
+    5: "#ff4057",
+    6: "#ff5fcf",
+    7: "#b56cff",
+    8: "#3d8bff"
+};
+
+
+/* ============================================================
    OBSTACLES
-   ========================================================== */
+   ============================================================ */
 
-const obstacles = [
-    [1, 2, 1],
-    [2, 3, 2],
-    [3, 2, 3],
-    [4, 4, 4],
-    [5, 2, 5],
-    [6, 3, 6],
-    [7, 2, 7],
-    [8, 4, 8]
+const OBSTACLES = [
+    { player: 1, x: -2, y: -5 },
+    { player: 2, x: 2, y: -4 },
+    { player: 3, x: 5, y: -2 },
+    { player: 4, x: 4, y: 3 },
+    { player: 5, x: 2, y: 5 },
+    { player: 6, x: -2, y: 5 },
+    { player: 7, x: -5, y: 2 },
+    { player: 8, x: -4, y: -3 }
 ];
 
 
-/* ==========================================================
-   CRÉATION DU PLATEAU
-   ========================================================== */
+/* ============================================================
+   UTILITAIRES
+   ============================================================ */
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+
+function distanceFromCenter(x, y) {
+    return Math.sqrt((x * x) + (y * y));
+}
+
+
+/* ============================================================
+   DÉTERMINATION DU SECTEUR
+   ============================================================ */
+
+function getPlayerFromPosition(x, y) {
+
+    if (x === 0 && y === 0) {
+        return CENTER_PLAYER;
+    }
+
+    let angle = Math.atan2(y, x) * 180 / Math.PI;
+
+    angle -= SECTOR_OFFSET;
+
+    while (angle < 0) {
+        angle += 360;
+    }
+
+    while (angle >= 360) {
+        angle -= 360;
+    }
+
+    const sector = Math.floor(angle / 45);
+
+    return (sector % PLAYERS) + 1;
+}
+
+
+/* ============================================================
+   TEST APPARTENANCE À LA GRILLE
+   ============================================================ */
+
+function isInsideBoard(x, y) {
+
+    const distance = distanceFromCenter(x, y);
+
+    /*
+     * La limite légèrement supérieure permet de conserver
+     * une silhouette circulaire imparfaite composée d'octogones.
+     */
+    return distance <= GRID_RADIUS + 0.35;
+}
+
+
+/* ============================================================
+   CRÉATION D'UNE CELLULE
+   ============================================================ */
+
+function createTile(x, y) {
+
+    const tile = document.createElement("div");
+
+    tile.className = "tile";
+
+    const player = getPlayerFromPosition(x, y);
+
+    tile.dataset.x = x;
+    tile.dataset.y = y;
+    tile.dataset.player = player;
+
+    tile.style.setProperty("--x", `${x * TILE_STEP}px`);
+    tile.style.setProperty("--y", `${y * TILE_STEP}px`);
+
+    tile.style.setProperty(
+        "--player-color",
+        player === 0
+            ? "#00e5ff"
+            : PLAYER_COLORS[player]
+    );
+
+    if (x === 0 && y === 0) {
+
+        tile.classList.add("center-tile");
+
+        tile.innerHTML = `
+            <span class="tile-center-mark">8</span>
+        `;
+
+    } else {
+
+        tile.innerHTML = `
+            <span class="tile-number">${player}</span>
+        `;
+    }
+
+    /*
+     * Marquage du secteur.
+     */
+    if (player > 0) {
+        tile.classList.add(`player-${player}`);
+    }
+
+    /*
+     * Obstacle.
+     */
+    const obstacle = OBSTACLES.find(
+        item => item.x === x && item.y === y
+    );
+
+    if (obstacle) {
+
+        tile.classList.add("obstacle");
+
+        tile.dataset.obstacle = "true";
+
+        tile.innerHTML = `
+            <span class="obstacle-mark">×</span>
+        `;
+    }
+
+    /*
+     * Interaction.
+     */
+    tile.addEventListener("click", handleTileClick);
+
+    tile.addEventListener("mouseenter", handleTileEnter);
+
+    tile.addEventListener("mouseleave", handleTileLeave);
+
+    board.appendChild(tile);
+
+    tiles.push(tile);
+}
+
+
+/* ============================================================
+   CRÉATION DE LA GRILLE
+   ============================================================ */
 
 function createBoard() {
 
     board.innerHTML = "";
 
-    selectedTile = null;
+    tiles = [];
 
-    let tileId = 0;
+    for (let y = -GRID_RADIUS; y <= GRID_RADIUS; y++) {
 
+        for (let x = -GRID_RADIUS; x <= GRID_RADIUS; x++) {
 
-    /*
-     * CASE CENTRALE
-     */
-
-    const centerTile = document.createElement("div");
-
-    centerTile.classList.add(
-        "tile",
-        "center-tile"
-    );
-
-    centerTile.dataset.id = tileId++;
-    centerTile.dataset.player = CENTER_PLAYER;
-    centerTile.dataset.ring = 0;
-    centerTile.dataset.position = 0;
-
-    centerTile.addEventListener(
-        "mouseenter",
-        () => updateCoordinates(0, 0, 0)
-    );
-
-    centerTile.addEventListener(
-        "click",
-        () => selectTile(
-            centerTile,
-            0,
-            0,
-            0
-        )
-    );
-
-    board.appendChild(centerTile);
-
-
-    /*
-     * 8 SECTEURS
-     */
-
-    for (let player = 1; player <= PLAYERS; player++) {
-
-        const sector = document.createElement("div");
-
-        sector.classList.add(
-            "sector-layer",
-            `sector-${player}`
-        );
-
-        sector.dataset.player = player;
-
-
-        /*
-         * LABEL DU JOUEUR
-         */
-
-        const label = document.createElement("div");
-
-        label.classList.add(
-            "sector-label"
-        );
-
-        label.textContent =
-            `PLAYER ${String(player).padStart(2, "0")}`;
-
-        sector.appendChild(label);
-
-
-        /*
-         * CASES DU SECTEUR
-         */
-
-        for (
-            let ring = 1;
-            ring <= RINGS;
-            ring++
-        ) {
-
-            const count =
-                TILES_PER_RING[ring - 1];
-
-
-            for (
-                let position = 0;
-                position < count;
-                position++
-            ) {
-
-                const tile =
-                    document.createElement("div");
-
-                tile.classList.add(
-                    "tile",
-                    `player-${player}`
-                );
-
-
-                /*
-                 * POSITION ANGULAIRE
-                 *
-                 * Chaque secteur fait 45°.
-                 */
-
-                const sectorAngle =
-                    (player - 1) * 45;
-
-                const sectorStep =
-                    45 / count;
-
-                const angle =
-                    sectorAngle +
-                    sectorStep * (position + 0.5);
-
-
-                /*
-                 * POSITION RADIALE
-                 */
-
-                const radius =
-                    72 +
-                    (ring - 1) * 64;
-
-
-                /*
-                 * COORDONNÉES
-                 */
-
-                tile.style.setProperty(
-                    "--radius",
-                    `${radius}px`
-                );
-
-                tile.style.setProperty(
-                    "--angle",
-                    `${angle}deg`
-                );
-
-
-                /*
-                 * DONNÉES
-                 */
-
-                tile.dataset.id = tileId++;
-
-                tile.dataset.player =
-                    player;
-
-                tile.dataset.ring =
-                    ring;
-
-                tile.dataset.position =
-                    position;
-
-
-                /*
-                 * OBSTACLE
-                 */
-
-                if (
-                    isObstacle(
-                        player,
-                        ring,
-                        position
-                    )
-                ) {
-
-                    tile.classList.add(
-                        "obstacle"
-                    );
-
-                }
-
-
-                /*
-                 * ÉVÉNEMENTS
-                 */
-
-                tile.addEventListener(
-                    "mouseenter",
-                    () =>
-                        updateCoordinates(
-                            player,
-                            ring,
-                            position
-                        )
-                );
-
-                tile.addEventListener(
-                    "click",
-                    () =>
-                        selectTile(
-                            tile,
-                            player,
-                            ring,
-                            position
-                        )
-                );
-
-
-                sector.appendChild(tile);
-
+            if (!isInsideBoard(x, y)) {
+                continue;
             }
 
+            createTile(x, y);
         }
-
-
-        board.appendChild(sector);
-
     }
 
+    /*
+     * Le centre est toujours créé.
+     */
+    if (!tiles.some(tile =>
+        Number(tile.dataset.x) === 0 &&
+        Number(tile.dataset.y) === 0
+    )) {
+        createTile(0, 0);
+    }
 }
 
 
-/* ==========================================================
-   OBSTACLE
-   ========================================================== */
+/* ============================================================
+   CLICK CELLULE
+   ============================================================ */
 
-function isObstacle(
-    player,
-    ring,
-    position
-) {
+function handleTileClick(event) {
 
-    return obstacles.some(
-        obstacle =>
-            obstacle[0] === player &&
-            obstacle[1] === ring &&
-            obstacle[2] === position
-    );
+    const tile = event.currentTarget;
 
-}
+    const x = Number(tile.dataset.x);
+    const y = Number(tile.dataset.y);
 
+    const player = Number(tile.dataset.player);
 
-/* ==========================================================
-   COORDONNÉES
-   ========================================================== */
+    /*
+     * Centre.
+     */
+    if (x === 0 && y === 0) {
 
-function updateCoordinates(
-    player,
-    ring,
-    position
-) {
+        selectTile(tile);
 
-    if (player === 0) {
-
-        coordinatesElement.textContent =
-            "CENTER";
+        showNotification("CENTRAL TILE SELECTED");
 
         return;
-
     }
 
+    /*
+     * Obstacle.
+     */
+    if (tile.dataset.obstacle === "true") {
 
-    coordinatesElement.textContent =
-        `P: ${String(player).padStart(2, "0")}   ` +
-        `R: ${String(ring).padStart(2, "0")}   ` +
-        `C: ${String(position + 1).padStart(2, "0")}`;
-
-}
-
-
-/* ==========================================================
-   SÉLECTION
-   ========================================================== */
-
-function selectTile(
-    tile,
-    player,
-    ring,
-    position
-) {
-
-    if (
-        tile.classList.contains(
-            "obstacle"
-        )
-    ) {
-
-        notify(
-            "CASE INACCESSIBLE"
-        );
+        showNotification("TILE BLOCKED");
 
         return;
-
     }
 
-
-    if (selectedTile) {
-
-        selectedTile.classList.remove(
-            "selected"
-        );
-
-    }
-
-
-    selectedTile = tile;
-
-    selectedTile.classList.add(
-        "selected"
-    );
-
+    /*
+     * Sélection.
+     */
+    selectTile(tile);
 
     score += 10;
 
-    updateInterface();
+    updateScore();
+
+    actionDisplay.textContent =
+        `P${currentPlayer} SELECTED X${x} Y${y}`;
+
+    showNotification(
+        `PLAYER ${currentPlayer} → TILE P${player} [${x}, ${y}]`
+    );
+}
 
 
-    if (player === 0) {
+/* ============================================================
+   SÉLECTION
+   ============================================================ */
 
-        notify(
-            "CENTRE DU PLATEAU"
-        );
+function selectTile(tile) {
 
-    } else {
-
-        notify(
-            `PLAYER ${String(player).padStart(2, "0")} ` +
-            `R${ring}:${position + 1}`
-        );
-
+    if (selectedTile) {
+        selectedTile.classList.remove("selected");
     }
 
-}
+    selectedTile = tile;
 
-
-/* ==========================================================
-   INTERFACE
-   ========================================================== */
-
-function updateInterface() {
-
-    scoreElement.textContent =
-        String(score).padStart(
-            4,
-            "0"
-        );
-
-    turnElement.textContent =
-        String(turn).padStart(
-            2,
-            "0"
-        );
-
-}
-
-
-/* ==========================================================
-   NOTIFICATION
-   ========================================================== */
-
-function notify(message) {
-
-    notification.textContent =
-        message;
-
-    notification.classList.add(
-        "show"
-    );
-
-    clearTimeout(
-        notify.timer
-    );
-
-    notify.timer =
-        setTimeout(
-            () =>
-                notification.classList.remove(
-                    "show"
-                ),
-            1400
-        );
-
-}
-
-
-/* ==========================================================
-   ACTIONS DES MENUS
-   ========================================================== */
-
-document
-    .querySelectorAll("[data-action]")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                const action =
-                    button.dataset.action;
-
-
-                switch (action) {
-
-                    case "new":
-                        newGame();
-                        break;
-
-                    case "save":
-                        notify(
-                            "GAME SAVED"
-                        );
-                        break;
-
-                    case "settings":
-                        notify(
-                            "SETTINGS"
-                        );
-                        break;
-
-                    case "inventory":
-                        notify(
-                            "INVENTORY"
-                        );
-                        break;
-
-                    case "map":
-                        notify(
-                            "8 PLAYER MAP"
-                        );
-                        break;
-
-                    case "stats":
-                        notify(
-                            `SCORE ${String(score).padStart(4, "0")}`
-                        );
-                        break;
-
-                    case "action":
-                        performAction();
-                        break;
-
-                    case "end":
-                        endTurn();
-                        break;
-
-                    case "reset":
-                        resetGame();
-                        break;
-
-                    case "help":
-                        notify(
-                            "SELECT A TILE"
-                        );
-                        break;
-
-                }
-
-            }
-        );
-
-    });
-
-
-/* ==========================================================
-   ACTION DE JEU
-   ========================================================== */
-
-function performAction() {
-
-    if (!selectedTile) {
-
-        notify(
-            "AUCUNE CASE SÉLECTIONNÉE"
-        );
-
-        return;
-
+    if (selectedTile) {
+        selectedTile.classList.add("selected");
     }
-
-
-    score += 50;
-
-    updateInterface();
-
-    notify(
-        "ACTION +50"
-    );
-
 }
 
 
-/* ==========================================================
-   FIN DU TOUR
-   ========================================================== */
+/* ============================================================
+   SURVOL
+   ============================================================ */
 
-function endTurn() {
+function handleTileEnter(event) {
 
-    turn++;
+    const tile = event.currentTarget;
 
+    const x = tile.dataset.x;
+    const y = tile.dataset.y;
+    const player = tile.dataset.player;
+
+    actionDisplay.textContent =
+        `P${player} · X${x} · Y${y}`;
+}
+
+
+function handleTileLeave() {
 
     if (selectedTile) {
 
-        selectedTile.classList.remove(
-            "selected"
-        );
+        const x = selectedTile.dataset.x;
+        const y = selectedTile.dataset.y;
 
+        actionDisplay.textContent =
+            `SELECTED X${x} Y${y}`;
+
+    } else {
+
+        actionDisplay.textContent = "SELECT A TILE";
     }
-
-
-    selectedTile = null;
-
-    updateInterface();
-
-
-    notify(
-        `TOUR ${String(turn).padStart(2, "0")}`
-    );
-
 }
 
 
-/* ==========================================================
+/* ============================================================
+   FIN DU TOUR
+   ============================================================ */
+
+function endTurn() {
+
+    currentPlayer++;
+
+    if (currentPlayer > PLAYERS) {
+        currentPlayer = 1;
+        turn++;
+    }
+
+    updateTurn();
+
+    selectTile(null);
+
+    actionDisplay.textContent = "SELECT A TILE";
+
+    showNotification(
+        `PLAYER ${currentPlayer} TURN`
+    );
+}
+
+
+/* ============================================================
    NOUVELLE PARTIE
-   ========================================================== */
+   ============================================================ */
 
 function newGame() {
 
-    score = 0;
+    currentPlayer = 1;
 
     turn = 1;
 
+    score = 0;
+
+    selectedTile = null;
+
+    gameStarted = true;
+
     createBoard();
 
-    updateInterface();
+    updateTurn();
 
-    notify(
-        "NEW GAME"
-    );
+    updateScore();
 
+    actionDisplay.textContent = "SELECT A TILE";
+
+    showNotification("NEW GAME STARTED");
 }
 
 
-/* ==========================================================
+/* ============================================================
    RESET
-   ========================================================== */
+   ============================================================ */
 
 function resetGame() {
 
-    score = 0;
+    currentPlayer = 1;
 
     turn = 1;
 
+    score = 0;
+
+    selectedTile = null;
+
     createBoard();
 
-    updateInterface();
+    updateTurn();
 
-    notify(
-        "GAME RESET"
-    );
+    updateScore();
 
+    actionDisplay.textContent = "SELECT A TILE";
+
+    showNotification("GAME RESET");
 }
 
 
-/* ==========================================================
-   CLAVIER
-   ========================================================== */
+/* ============================================================
+   SCORE
+   ============================================================ */
 
-document.addEventListener(
-    "keydown",
-    event => {
+function updateScore() {
 
-        switch (
-            event.key.toLowerCase()
+    if (scoreDisplay) {
+        scoreDisplay.textContent =
+            String(score).padStart(3, "0");
+    }
+}
+
+
+/* ============================================================
+   TOUR
+   ============================================================ */
+
+function updateTurn() {
+
+    if (turnDisplay) {
+        turnDisplay.textContent =
+            String(turn).padStart(2, "0");
+    }
+
+    const playerLabels =
+        document.querySelectorAll(".player-number");
+
+    playerLabels.forEach(label => {
+
+        label.classList.remove("active");
+
+        if (
+            Number(label.dataset.player) === currentPlayer
         ) {
+            label.classList.add("active");
+        }
+    });
+}
 
-            case "n":
-                newGame();
-                break;
 
-            case "r":
-                resetGame();
-                break;
+/* ============================================================
+   NOTIFICATION
+   ============================================================ */
 
-            case "enter":
-                performAction();
-                break;
+function showNotification(message) {
 
-            case "escape":
+    if (!notification) {
+        return;
+    }
 
-                if (selectedTile) {
+    notification.textContent = message;
 
-                    selectedTile.classList.remove(
-                        "selected"
-                    );
+    notification.classList.add("visible");
 
-                }
+    clearTimeout(notification._timer);
 
-                selectedTile = null;
+    notification._timer = setTimeout(() => {
 
-                break;
+        notification.classList.remove("visible");
 
-            case "e":
-                endTurn();
-                break;
+    }, 1800);
+}
 
+
+/* ============================================================
+   SAUVEGARDE LOCALE
+   ============================================================ */
+
+function saveGame() {
+
+    const data = {
+
+        currentPlayer,
+
+        turn,
+
+        score,
+
+        selectedTile: selectedTile
+            ? {
+                x: Number(selectedTile.dataset.x),
+                y: Number(selectedTile.dataset.y)
+            }
+            : null,
+
+        savedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem(
+        "88_AN0THER_G4ME_SAVE",
+        JSON.stringify(data)
+    );
+
+    showNotification("GAME SAVED");
+}
+
+
+/* ============================================================
+   CHARGEMENT
+   ============================================================ */
+
+function loadGame() {
+
+    const saved =
+        localStorage.getItem("88_AN0THER_G4ME_SAVE");
+
+    if (!saved) {
+
+        showNotification("NO SAVE FOUND");
+
+        return;
+    }
+
+    try {
+
+        const data = JSON.parse(saved);
+
+        currentPlayer =
+            clamp(
+                Number(data.currentPlayer) || 1,
+                1,
+                PLAYERS
+            );
+
+        turn =
+            Math.max(
+                1,
+                Number(data.turn) || 1
+            );
+
+        score =
+            Math.max(
+                0,
+                Number(data.score) || 0
+            );
+
+        createBoard();
+
+        updateTurn();
+
+        updateScore();
+
+        selectTile(null);
+
+        if (data.selectedTile) {
+
+            const tile = tiles.find(tile =>
+                Number(tile.dataset.x) ===
+                    Number(data.selectedTile.x) &&
+                Number(tile.dataset.y) ===
+                    Number(data.selectedTile.y)
+            );
+
+            if (tile) {
+                selectTile(tile);
+            }
         }
 
+        showNotification("GAME LOADED");
+
+    } catch (error) {
+
+        console.error(error);
+
+        showNotification("INVALID SAVE");
     }
-);
+}
 
 
-/* ==========================================================
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+function openSettings() {
+
+    showNotification(
+        "SETTINGS NOT AVAILABLE IN v1.0"
+    );
+}
+
+
+/* ============================================================
+   CLAVIER
+   ============================================================ */
+
+document.addEventListener("keydown", event => {
+
+    switch (event.key.toLowerCase()) {
+
+        case "n":
+            newGame();
+            break;
+
+        case "s":
+            saveGame();
+            break;
+
+        case "r":
+            resetGame();
+            break;
+
+        case "e":
+        case "enter":
+            endTurn();
+            break;
+
+        case "escape":
+            selectTile(null);
+            actionDisplay.textContent =
+                "SELECT A TILE";
+            break;
+    }
+});
+
+
+/* ============================================================
+   BOUTONS
+   ============================================================ */
+
+if (endTurnButton) {
+    endTurnButton.addEventListener(
+        "click",
+        endTurn
+    );
+}
+
+if (resetButton) {
+    resetButton.addEventListener(
+        "click",
+        resetGame
+    );
+}
+
+if (newGameButton) {
+    newGameButton.addEventListener(
+        "click",
+        newGame
+    );
+}
+
+if (saveButton) {
+    saveButton.addEventListener(
+        "click",
+        saveGame
+    );
+}
+
+if (settingsButton) {
+    settingsButton.addEventListener(
+        "click",
+        openSettings
+    );
+}
+
+
+/* ============================================================
    INITIALISATION
-   ========================================================== */
+   ============================================================ */
 
 createBoard();
 
-updateInterface();
+updateTurn();
+
+updateScore();
+
+actionDisplay.textContent = "SELECT A TILE";
+
+console.log(
+    "88_AN0THER_G4ME v1.0 initialized"
+);

@@ -1,6 +1,7 @@
 /* ==========================================================
    88_AN0THER_G4ME
    INDEX.CSS
+   V1.0
    ========================================================== */
 
 
@@ -40,11 +41,27 @@
 
     --muted: #657783;
 
-    --tile-size: 58px;
+
+    /*
+     * GRILLE
+     *
+     * La cellule est volontairement légèrement
+     * plus grande que le déplacement.
+     *
+     * 42px / 40px
+     *
+     * Cela supprime les interstices visibles
+     * entre les octogones.
+     */
+
+    --tile-size: 42px;
+
+    --tile-step: 40px;
+
+
+    --board-size: 650px;
 
     --menu-trigger: 8px;
-
-    --board-size: 760px;
 
 }
 
@@ -69,6 +86,8 @@ body {
 
     margin: 0;
 
+    padding: 0;
+
 }
 
 
@@ -77,6 +96,7 @@ body {
     overflow: hidden;
 
     background:
+
         radial-gradient(
             circle at center,
             #101c26 0%,
@@ -126,10 +146,11 @@ body {
 
     left: 50%;
 
-    width: min(
-        900px,
-        70vw
-    );
+    width:
+        min(
+            900px,
+            70vw
+        );
 
     transform:
         translateX(-50%);
@@ -139,6 +160,8 @@ body {
     justify-content: space-between;
 
     align-items: flex-end;
+
+    z-index: 20;
 
 }
 
@@ -182,6 +205,8 @@ h1 span {
 
     letter-spacing: 0.15em;
 
+    white-space: nowrap;
+
 }
 
 
@@ -193,9 +218,17 @@ h1 span {
 
     position: relative;
 
-    width: 80vw;
+    width:
+        min(
+            80vw,
+            900px
+        );
 
-    height: 72vh;
+    height:
+        min(
+            76vh,
+            760px
+        );
 
     display: flex;
 
@@ -203,34 +236,39 @@ h1 span {
 
     justify-content: center;
 
-    overflow: hidden;
+    overflow: visible;
 
 }
 
 
 /* ==========================================================
-   PLATEAU CIRCULAIRE
+   PLATEAU
    ========================================================== */
 
 .board {
 
     position: relative;
 
-    width: var(--board-size);
+    width:
+        min(
+            var(--board-size),
+            70vh,
+            70vw
+        );
 
-    height: var(--board-size);
+    height:
+        min(
+            var(--board-size),
+            70vh,
+            70vw
+        );
 
-    max-width: 72vh;
-
-    max-height: 72vh;
-
-    min-width: 500px;
-
-    min-height: 500px;
+    flex-shrink: 0;
 
     border-radius: 50%;
 
     background:
+
         radial-gradient(
             circle at center,
             #101c24 0%,
@@ -244,6 +282,7 @@ h1 span {
         #263943;
 
     box-shadow:
+
         0 0 40px
         rgba(
             0,
@@ -251,6 +290,7 @@ h1 span {
             0,
             0.8
         ),
+
         inset 0 0 50px
         rgba(
             0,
@@ -263,7 +303,7 @@ h1 span {
 
 
 /* ==========================================================
-   AXES DES 8 SECTEURS
+   GUIDES DES 8 SECTEURS
    ========================================================== */
 
 .board::before {
@@ -277,16 +317,20 @@ h1 span {
     border-radius: 50%;
 
     background:
+
         repeating-conic-gradient(
             from -22.5deg,
+
             rgba(
                 0,
                 229,
                 255,
-                0.14
+                0.10
             )
             0deg 1px,
-            transparent 1px 45deg
+
+            transparent
+            1px 45deg
         );
 
     pointer-events: none;
@@ -297,7 +341,7 @@ h1 span {
 
 
 /* ==========================================================
-   CERCLES DES RINGS
+   GUIDE CENTRAL
    ========================================================== */
 
 .board::after {
@@ -306,107 +350,47 @@ h1 span {
 
     position: absolute;
 
-    inset: 72px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(
-            0,
-            229,
-            255,
-            0.07
-        );
-
-    box-shadow:
-        0 0 0 64px
-        rgba(
-            0,
-            229,
-            255,
-            0.018
-        ),
-        0 0 0 128px
-        rgba(
-            0,
-            229,
-            255,
-            0.018
-        ),
-        0 0 0 192px
-        rgba(
-            0,
-            229,
-            255,
-            0.018
-        );
-
-    pointer-events: none;
-
-    z-index: 1;
-
-}
-
-
-/* ==========================================================
-   SECTEUR
-   ========================================================== */
-
-.sector-layer {
-
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 5;
-
-    pointer-events: none;
-
-}
-
-
-/* ==========================================================
-   LABEL JOUEUR
-   ========================================================== */
-
-.sector-label {
-
-    position: absolute;
-
     left: 50%;
 
     top: 50%;
 
-    width: 115px;
+    width: 4px;
 
-    margin-top: -350px;
+    height: 4px;
 
     transform:
-        translateX(-50%);
-
-    text-align: center;
-
-    color:
-        rgba(
-            220,
-            231,
-            236,
-            0.35
+        translate(
+            -50%,
+            -50%
         );
 
-    font-size: 8px;
+    border-radius: 50%;
 
-    letter-spacing:
-        0.18em;
+    background:
+        var(--cyan);
+
+    box-shadow:
+
+        0 0 10px
+        var(--cyan),
+
+        0 0 20px
+        rgba(
+            0,
+            229,
+            255,
+            .4
+        );
 
     pointer-events: none;
+
+    z-index: 2;
 
 }
 
 
 /* ==========================================================
-   CASE OCTOGONALE
+   CELLULE OCTOGONALE
    ========================================================== */
 
 .tile {
@@ -417,105 +401,156 @@ h1 span {
 
     left: 50%;
 
-    width: var(--tile-size);
+    width:
+        var(--tile-size);
 
-    height: var(--tile-size);
+    height:
+        var(--tile-size);
 
     margin:
         calc(
             var(--tile-size) / -2
         );
 
-    background:
-        var(--border);
-
-    clip-path:
-        polygon(
-            29% 0%,
-            71% 0%,
-            100% 29%,
-            100% 71%,
-            71% 100%,
-            29% 100%,
-            0% 71%,
-            0% 29%
-        );
+    /*
+     * NOUVELLE GÉOMÉTRIE :
+     *
+     * --x = position horizontale
+     * --y = position verticale
+     */
 
     transform:
-        rotate(var(--angle))
-        translateY(
-            calc(
-                var(--radius) * -1
-            )
+
+        translate(
+            var(--x),
+            var(--y)
         );
 
-    transform-origin:
-        center center;
+    background:
+
+        var(
+            --player-color,
+            var(--border)
+        );
+
+    /*
+     * Octogone régulier.
+     */
+
+    clip-path:
+
+        polygon(
+            29.289% 0%,
+            70.711% 0%,
+            100% 29.289%,
+            100% 70.711%,
+            70.711% 100%,
+            29.289% 100%,
+            0% 70.711%,
+            0% 29.289%
+        );
 
     cursor: pointer;
 
     pointer-events: auto;
 
+    z-index: 5;
+
     transition:
-        transform 0.12s ease,
-        background 0.12s ease,
-        filter 0.12s ease;
+
+        transform .12s ease,
+
+        filter .12s ease,
+
+        background .12s ease;
 
 }
 
 
+/*
+ * IMPORTANT
+ *
+ * Aucun ::before
+ * Aucun ::after
+ *
+ * Les anciennes couches internes créaient
+ * artificiellement des espaces visibles.
+ */
+
+
 /* ==========================================================
-   INTÉRIEUR
+   NUMÉRO DE CELLULE
    ========================================================== */
 
-.tile::before {
-
-    content: "";
+.tile-number {
 
     position: absolute;
 
-    inset: 2px;
+    left: 50%;
 
-    background:
-        linear-gradient(
-            135deg,
-            #0d161e,
-            #091017
+    top: 50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
         );
 
-    clip-path: inherit;
+    color:
+        rgba(
+            0,
+            0,
+            0,
+            .62
+        );
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    pointer-events: none;
+
+    user-select: none;
 
 }
 
 
 /* ==========================================================
-   CONTOUR
+   CENTRE
    ========================================================== */
 
-.tile::after {
+.center-tile {
 
-    content: "";
+    background:
+        var(--cyan);
 
-    position: absolute;
+    z-index: 30;
 
-    inset: 6px;
+    box-shadow:
 
-    border:
-        1px solid
+        0 0 15px
         rgba(
             0,
             229,
             255,
-            0.08
+            .65
         );
 
-    clip-path: inherit;
+}
+
+
+.center-tile .tile-number {
+
+    color:
+        #041016;
+
+    font-size: 13px;
 
 }
 
 
 /* ==========================================================
-   COULEURS DES 8 TERRAINS
+   COULEURS JOUEURS
    ========================================================== */
 
 .player-1 {
@@ -583,107 +618,69 @@ h1 span {
 
 
 /* ==========================================================
-   HOVER
+   SURVOL
    ========================================================== */
 
 .tile:hover {
 
     transform:
-        rotate(var(--angle))
-        translateY(
-            calc(
-                var(--radius) * -1
-            )
+
+        translate(
+            var(--x),
+            var(--y)
         )
-        scale(1.08);
+
+        scale(1.035);
 
     background:
         var(--player-color);
 
     filter:
+
         drop-shadow(
-            0 0 8px
+            0 0 7px
             var(--player-color)
         );
 
-    z-index: 50;
-
-}
-
-
-.tile:hover::before {
-
-    background:
-        #10242e;
+    z-index: 80;
 
 }
 
 
 /* ==========================================================
-   CASE SÉLECTIONNÉE
+   SÉLECTION
    ========================================================== */
 
 .tile.selected {
+
+    transform:
+
+        translate(
+            var(--x),
+            var(--y)
+        )
+
+        scale(1.045);
 
     background:
         var(--green);
 
     filter:
+
         drop-shadow(
-            0 0 12px
+            0 0 10px
             var(--green)
         );
 
-    z-index: 60;
+    z-index: 90;
 
 }
 
 
-.tile.selected::before {
+.tile.selected .tile-number {
 
-    background:
-        #10281e;
-
-}
-
-
-/* ==========================================================
-   CENTRE
-   ========================================================== */
-
-.center-tile {
-
-    --radius: 0px;
-
-    --angle: 0deg;
-
-    background:
-        var(--cyan);
-
-    filter:
-        drop-shadow(
-            0 0 18px
-            rgba(
-                0,
-                229,
-                255,
-                0.65
-            )
-        );
-
-    z-index: 20;
-
-}
-
-
-.center-tile::before {
-
-    background:
-        radial-gradient(
-            circle,
-            #12313b,
-            #09202a
-        );
+    color:
+        #02140d;
 
 }
 
@@ -697,27 +694,8 @@ h1 span {
     background:
         #343d44;
 
-}
-
-
-.tile.obstacle::before {
-
-    background:
-        #171c21;
-
-}
-
-
-.tile.obstacle::after {
-
-    background:
-        linear-gradient(
-            45deg,
-            transparent 42%,
-            #38444d 43%,
-            #38444d 57%,
-            transparent 58%
-        );
+    filter:
+        saturate(.25);
 
 }
 
@@ -727,93 +705,184 @@ h1 span {
     background:
         var(--red);
 
+    filter:
+
+        drop-shadow(
+            0 0 7px
+            var(--red)
+        );
+
 }
 
 
 /* ==========================================================
-   INDICATEUR DES SECTEURS
+   MARQUE OBSTACLE
    ========================================================== */
 
-.sector-1 .sector-label {
+.obstacle-mark {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+
+    color:
+        #0a0e12;
+
+    font-size: 18px;
+
+    pointer-events: none;
+
+}
+
+
+/* ==========================================================
+   HINT
+   ========================================================== */
+
+.hint {
+
+    position: absolute;
+
+    bottom: 72px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    letter-spacing: 0.18em;
+
+    white-space: nowrap;
+
+    z-index: 20;
+
+}
+
+
+.hint span {
 
     color:
         var(--cyan);
 
-}
-
-
-.sector-2 .sector-label {
-
-    color:
-        var(--green);
-
-}
-
-
-.sector-3 .sector-label {
-
-    color:
-        var(--orange);
-
-}
-
-
-.sector-4 .sector-label {
-
-    color:
-        var(--red);
-
-}
-
-
-.sector-5 .sector-label {
-
-    color:
-        var(--violet);
-
-}
-
-
-.sector-6 .sector-label {
-
-    color:
-        var(--blue);
-
-}
-
-
-.sector-7 .sector-label {
-
-    color:
-        var(--yellow);
-
-}
-
-
-.sector-8 .sector-label {
-
-    color:
-        var(--pink);
+    margin-right: 6px;
 
 }
 
 
 /* ==========================================================
-   MENU GÉNÉRAL
+   NOTIFICATION
+   ========================================================== */
+
+.notification {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 90px;
+
+    transform:
+        translate(
+            -50%,
+            15px
+        );
+
+    padding:
+        10px 18px;
+
+    color:
+        var(--cyan);
+
+    background:
+        rgba(
+            5,
+            12,
+            17,
+            .96
+        );
+
+    border:
+        1px solid
+        var(--cyan);
+
+    box-shadow:
+
+        0 0 15px
+        rgba(
+            0,
+            229,
+            255,
+            .15
+        );
+
+    font-size: 9px;
+
+    letter-spacing: .14em;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+
+        opacity .18s ease,
+
+        transform .18s ease;
+
+    z-index: 1000;
+
+}
+
+
+.notification.visible {
+
+    opacity: 1;
+
+    transform:
+        translate(
+            -50%,
+            0
+        );
+
+}
+
+
+/* ==========================================================
+   MENUS LATÉRAUX
    ========================================================== */
 
 .edge-menu {
 
     position: fixed;
 
-    z-index: 100;
-
     background:
-        rgba(
-            7,
-            13,
-            19,
-            0.97
+
+        linear-gradient(
+            180deg,
+            rgba(
+                10,
+                16,
+                23,
+                .98
+            ),
+            rgba(
+                5,
+                10,
+                15,
+                .98
+            )
         );
 
     border:
@@ -821,22 +890,55 @@ h1 span {
         var(--border);
 
     box-shadow:
-        0 0 40px
+
+        0 0 25px
         rgba(
             0,
             0,
             0,
-            0.6
+            .55
         );
 
+    z-index: 500;
+
     transition:
-        transform 0.3s
-        cubic-bezier(
-            0.2,
-            0.8,
-            0.2,
-            1
-        );
+        transform .2s ease;
+
+}
+
+
+.menu-inner {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding:
+        12px 18px;
+
+}
+
+
+.menu-inner.vertical {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    justify-content: flex-start;
+
+    gap: 3px;
+
+    padding:
+        25px;
 
 }
 
@@ -860,6 +962,7 @@ h1 span {
     height: 62px;
 
     transform:
+
         translate(
             -50%,
             calc(
@@ -930,6 +1033,7 @@ h1 span {
     height: 62px;
 
     transform:
+
         translate(
             -50%,
             calc(
@@ -996,6 +1100,7 @@ h1 span {
     height: 390px;
 
     transform:
+
         translate(
             calc(
                 -100% +
@@ -1062,6 +1167,7 @@ h1 span {
     height: 390px;
 
     transform:
+
         translate(
             calc(
                 100% -
@@ -1114,45 +1220,6 @@ h1 span {
 
 
 /* ==========================================================
-   CONTENU DES MENUS
-   ========================================================== */
-
-.menu-inner {
-
-    width: 100%;
-
-    height: 100%;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content:
-        space-evenly;
-
-    padding:
-        0 20px;
-
-}
-
-
-.menu-inner.vertical {
-
-    flex-direction: column;
-
-    align-items: stretch;
-
-    justify-content: center;
-
-    gap: 10px;
-
-    padding:
-        35px 25px;
-
-}
-
-
-/* ==========================================================
    LOGO
    ========================================================== */
 
@@ -1166,7 +1233,9 @@ h1 span {
     font-weight: bold;
 
     letter-spacing:
-        0.1em;
+        .1em;
+
+    margin-right: auto;
 
 }
 
@@ -1204,12 +1273,12 @@ button {
     font-size: 9px;
 
     letter-spacing:
-        0.14em;
+        .14em;
 
     cursor: pointer;
 
     transition:
-        all 0.15s ease;
+        all .15s ease;
 
 }
 
@@ -1227,7 +1296,7 @@ button:hover {
             0,
             229,
             255,
-            0.05
+            .05
         );
 
 }
@@ -1273,7 +1342,7 @@ button.primary:hover {
     font-size: 9px;
 
     letter-spacing:
-        0.25em;
+        .25em;
 
     padding-bottom:
         12px;
@@ -1309,6 +1378,8 @@ button.primary:hover {
 
     height: 42px;
 
+    flex-shrink: 0;
+
     display: grid;
 
     place-items: center;
@@ -1323,6 +1394,7 @@ button.primary:hover {
     font-size: 9px;
 
     clip-path:
+
         polygon(
             29% 0%,
             71% 0%,
@@ -1405,102 +1477,18 @@ button.primary:hover {
 
     font-size: 9px;
 
+    letter-spacing:
+        .12em;
+
 }
 
 
 .stat strong {
 
     color:
-        var(--cyan);
+        var(--text);
 
-    font-weight:
-        normal;
-
-}
-
-
-/* ==========================================================
-   INDICATION
-   ========================================================== */
-
-.hint {
-
-    position: absolute;
-
-    bottom: 75px;
-
-    color:
-        var(--muted);
-
-    font-size: 8px;
-
-    letter-spacing:
-        0.25em;
-
-}
-
-
-.hint span {
-
-    color:
-        var(--cyan);
-
-}
-
-
-/* ==========================================================
-   NOTIFICATION
-   ========================================================== */
-
-.notification {
-
-    position: fixed;
-
-    z-index: 300;
-
-    top: 25px;
-
-    left: 50%;
-
-    padding:
-        10px 18px;
-
-    border:
-        1px solid
-        var(--cyan);
-
-    background:
-        rgba(
-            5,
-            8,
-            12,
-            0.96
-        );
-
-    color:
-        var(--cyan);
-
-    font-size: 9px;
-
-    transform:
-        translate(
-            -50%,
-            -100px
-        );
-
-    transition:
-        transform 0.25s ease;
-
-}
-
-
-.notification.show {
-
-    transform:
-        translate(
-            -50%,
-            0
-        );
+    margin-left: 5px;
 
 }
 
@@ -1509,42 +1497,56 @@ button.primary:hover {
    RESPONSIVE
    ========================================================== */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
     :root {
 
-        --tile-size: 50px;
+        --tile-size: 40px;
+
+        --tile-step: 38px;
+
+        --board-size: 600px;
 
     }
 
+    .menu-left,
+    .menu-right {
 
-    .board {
-
-        min-width: 440px;
-
-        min-height: 440px;
+        width: 210px;
 
     }
-
-
-    .sector-label {
-
-        margin-top: -275px;
-
-    }
-
 
     .game-header {
 
-        width: 75vw;
+        width: 65vw;
 
     }
 
+}
+
+
+@media (max-width: 850px) {
+
+    :root {
+
+        --tile-size: 36px;
+
+        --tile-step: 34px;
+
+        --board-size: 520px;
+
+    }
 
     .menu-left,
     .menu-right {
 
         width: 190px;
+
+    }
+
+    .game-header {
+
+        width: 60vw;
 
     }
 
@@ -1555,47 +1557,56 @@ button.primary:hover {
 
     :root {
 
-        --tile-size: 42px;
+        --tile-size: 32px;
+
+        --tile-step: 30px;
 
     }
 
+    .board-container {
+
+        width: 100vw;
+
+        height: 76vh;
+
+    }
 
     .board {
 
-        min-width: 380px;
+        width:
+            min(
+                88vw,
+                70vh
+            );
 
-        min-height: 380px;
+        height:
+            min(
+                88vw,
+                70vh
+            );
 
     }
-
-
-    .sector-label {
-
-        margin-top: -235px;
-
-        font-size: 7px;
-
-    }
-
 
     .game-header {
 
-        width: 82vw;
+        top: 70px;
+
+        width: 80vw;
 
     }
-
 
     .game-header h1 {
 
-        font-size: 20px;
+        font-size: 21px;
 
     }
-
 
     .menu-left,
     .menu-right {
 
         width: 170px;
+
+        height: 330px;
 
     }
 
@@ -1604,25 +1615,78 @@ button.primary:hover {
 
 @media (max-height: 700px) {
 
+    :root {
+
+        --tile-size: 36px;
+
+        --tile-step: 34px;
+
+        --board-size: 560px;
+
+    }
+
     .game-header {
 
-        top: 68px;
+        top: 65px;
 
     }
 
+}
 
-    .board {
 
-        transform:
-            scale(0.82);
+@media (max-height: 580px) {
+
+    :root {
+
+        --tile-size: 30px;
+
+        --tile-step: 28px;
+
+        --board-size: 450px;
 
     }
 
+    .game-header {
+
+        top: 58px;
+
+    }
 
     .hint {
 
-        bottom: 65px;
+        bottom: 60px;
 
     }
+
+}
+
+
+/* ==========================================================
+   FOCUS
+   ========================================================== */
+
+button:focus-visible {
+
+    outline:
+        1px solid
+        var(--cyan);
+
+    outline-offset:
+        2px;
+
+}
+
+
+/* ==========================================================
+   SÉLECTION TEXTE
+   ========================================================== */
+
+::selection {
+
+    background:
+        var(--cyan);
+
+    color:
+        #041016;
 
 }
