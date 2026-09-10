@@ -1,7 +1,7 @@
 /* ==========================================================
    88_AN0THER_G4ME
    INDEX.CSS
-   V1.0
+   v1.0
    ========================================================== */
 
 
@@ -21,45 +21,46 @@
 
     --border-light: #334a58;
 
-    --cyan: #00e5ff;
-
-    --green: #00ff99;
-
-    --orange: #ff9d00;
-
-    --red: #ff4057;
-
-    --violet: #b56cff;
-
-    --blue: #3d8bff;
-
-    --yellow: #ffe600;
-
-    --pink: #ff5fcf;
-
     --text: #dce7ec;
 
     --muted: #657783;
 
 
-    /*
-     * GRILLE
-     *
-     * La cellule est volontairement légèrement
-     * plus grande que le déplacement.
-     *
-     * 42px / 40px
-     *
-     * Cela supprime les interstices visibles
-     * entre les octogones.
-     */
+    /* ======================================================
+       COULEURS JOUEURS
+       ====================================================== */
+
+    --cyan: #00e5ff;
+
+    --green: #00ff99;
+
+    --yellow: #ffe600;
+
+    --red: #ff4057;
+
+    --orange: #ff8a00;
+
+    --magenta: #ff3bd4;
+
+    --violet: #a855ff;
+
+    --blue: #3d8bff;
+
+
+    /* ======================================================
+       PLATEAU
+       ====================================================== */
 
     --tile-size: 42px;
 
     --tile-step: 40px;
 
+    --board-size: 620px;
 
-    --board-size: 650px;
+
+    /* ======================================================
+       MENUS
+       ====================================================== */
 
     --menu-trigger: 8px;
 
@@ -85,8 +86,6 @@ body {
     height: 100%;
 
     margin: 0;
-
-    padding: 0;
 
 }
 
@@ -146,11 +145,10 @@ body {
 
     left: 50%;
 
-    width:
-        min(
-            900px,
-            70vw
-        );
+    width: min(
+        900px,
+        70vw
+    );
 
     transform:
         translateX(-50%);
@@ -161,7 +159,7 @@ body {
 
     align-items: flex-end;
 
-    z-index: 20;
+    z-index: 10;
 
 }
 
@@ -180,6 +178,8 @@ body {
 h1 {
 
     margin: 5px 0 0;
+
+    color: var(--text);
 
     font-size: 28px;
 
@@ -205,8 +205,6 @@ h1 span {
 
     letter-spacing: 0.15em;
 
-    white-space: nowrap;
-
 }
 
 
@@ -218,17 +216,9 @@ h1 span {
 
     position: relative;
 
-    width:
-        min(
-            80vw,
-            900px
-        );
+    width: 80vw;
 
-    height:
-        min(
-            76vh,
-            760px
-        );
+    height: 72vh;
 
     display: flex;
 
@@ -236,7 +226,7 @@ h1 span {
 
     justify-content: center;
 
-    overflow: visible;
+    overflow: hidden;
 
 }
 
@@ -249,21 +239,23 @@ h1 span {
 
     position: relative;
 
-    width:
+    width: var(--board-size);
+
+    height: var(--board-size);
+
+    max-width:
         min(
             var(--board-size),
-            70vh,
-            70vw
+            calc(100vw - 90px)
         );
 
-    height:
+    max-height:
         min(
             var(--board-size),
-            70vh,
-            70vw
+            calc(100vh - 170px)
         );
 
-    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
 
     border-radius: 50%;
 
@@ -303,7 +295,7 @@ h1 span {
 
 
 /* ==========================================================
-   GUIDES DES 8 SECTEURS
+   AXES DES 8 SECTEURS
    ========================================================== */
 
 .board::before {
@@ -319,18 +311,20 @@ h1 span {
     background:
 
         repeating-conic-gradient(
+
             from -22.5deg,
 
             rgba(
                 0,
                 229,
                 255,
-                0.10
+                0.14
             )
             0deg 1px,
 
             transparent
             1px 45deg
+
         );
 
     pointer-events: none;
@@ -341,7 +335,7 @@ h1 span {
 
 
 /* ==========================================================
-   GUIDE CENTRAL
+   INDICATIONS RADIALES
    ========================================================== */
 
 .board::after {
@@ -350,139 +344,74 @@ h1 span {
 
     position: absolute;
 
-    left: 50%;
-
-    top: 50%;
-
-    width: 4px;
-
-    height: 4px;
-
-    transform:
-        translate(
-            -50%,
-            -50%
-        );
+    inset: 72px;
 
     border-radius: 50%;
 
-    background:
-        var(--cyan);
-
-    box-shadow:
-
-        0 0 10px
-        var(--cyan),
-
-        0 0 20px
+    border:
+        1px solid
         rgba(
             0,
             229,
             255,
-            .4
+            0.07
+        );
+
+    box-shadow:
+
+        0 0 0 64px
+        rgba(
+            0,
+            229,
+            255,
+            0.018
+        ),
+
+        0 0 0 128px
+        rgba(
+            0,
+            229,
+            255,
+            0.018
+        ),
+
+        0 0 0 192px
+        rgba(
+            0,
+            229,
+            255,
+            0.018
         );
 
     pointer-events: none;
 
-    z-index: 2;
+    z-index: 1;
 
 }
 
 
 /* ==========================================================
-   CELLULE OCTOGONALE
+   SECTEURS
    ========================================================== */
 
-.tile {
+.sector-layer {
 
     position: absolute;
 
-    top: 50%;
-
-    left: 50%;
-
-    width:
-        var(--tile-size);
-
-    height:
-        var(--tile-size);
-
-    margin:
-        calc(
-            var(--tile-size) / -2
-        );
-
-    /*
-     * NOUVELLE GÉOMÉTRIE :
-     *
-     * --x = position horizontale
-     * --y = position verticale
-     */
-
-    transform:
-
-        translate(
-            var(--x),
-            var(--y)
-        );
-
-    background:
-
-        var(
-            --player-color,
-            var(--border)
-        );
-
-    /*
-     * Octogone régulier.
-     */
-
-    clip-path:
-
-        polygon(
-            29.289% 0%,
-            70.711% 0%,
-            100% 29.289%,
-            100% 70.711%,
-            70.711% 100%,
-            29.289% 100%,
-            0% 70.711%,
-            0% 29.289%
-        );
-
-    cursor: pointer;
-
-    pointer-events: auto;
+    inset: 0;
 
     z-index: 5;
 
-    transition:
-
-        transform .12s ease,
-
-        filter .12s ease,
-
-        background .12s ease;
+    pointer-events: none;
 
 }
 
 
-/*
- * IMPORTANT
- *
- * Aucun ::before
- * Aucun ::after
- *
- * Les anciennes couches internes créaient
- * artificiellement des espaces visibles.
- */
-
-
 /* ==========================================================
-   NUMÉRO DE CELLULE
+   LABELS JOUEURS
    ========================================================== */
 
-.tile-number {
+.sector-label {
 
     position: absolute;
 
@@ -490,67 +419,35 @@ h1 span {
 
     top: 50%;
 
+    width: 115px;
+
+    margin-top: -350px;
+
     transform:
-        translate(
-            -50%,
-            -50%
-        );
+        translateX(-50%);
+
+    text-align: center;
 
     color:
         rgba(
-            0,
-            0,
-            0,
-            .62
+            220,
+            231,
+            236,
+            0.35
         );
 
-    font-size: 9px;
+    font-size: 8px;
 
-    font-weight: bold;
+    letter-spacing:
+        0.18em;
 
     pointer-events: none;
 
-    user-select: none;
-
 }
 
 
 /* ==========================================================
-   CENTRE
-   ========================================================== */
-
-.center-tile {
-
-    background:
-        var(--cyan);
-
-    z-index: 30;
-
-    box-shadow:
-
-        0 0 15px
-        rgba(
-            0,
-            229,
-            255,
-            .65
-        );
-
-}
-
-
-.center-tile .tile-number {
-
-    color:
-        #041016;
-
-    font-size: 13px;
-
-}
-
-
-/* ==========================================================
-   COULEURS JOUEURS
+   COULEURS DES 8 TERRAINS
    ========================================================== */
 
 .player-1 {
@@ -572,7 +469,7 @@ h1 span {
 .player-3 {
 
     --player-color:
-        var(--orange);
+        var(--yellow);
 
 }
 
@@ -588,7 +485,7 @@ h1 span {
 .player-5 {
 
     --player-color:
-        var(--violet);
+        var(--orange);
 
 }
 
@@ -596,7 +493,7 @@ h1 span {
 .player-6 {
 
     --player-color:
-        var(--blue);
+        var(--magenta);
 
 }
 
@@ -604,7 +501,7 @@ h1 span {
 .player-7 {
 
     --player-color:
-        var(--yellow);
+        var(--violet);
 
 }
 
@@ -612,13 +509,346 @@ h1 span {
 .player-8 {
 
     --player-color:
-        var(--pink);
+        var(--blue);
 
 }
 
 
 /* ==========================================================
-   SURVOL
+   CASE OCTOGONALE
+   ========================================================== */
+
+.tile {
+
+    position: absolute;
+
+    top: 50%;
+
+    left: 50%;
+
+    width: var(--tile-size);
+
+    height: var(--tile-size);
+
+    margin:
+        calc(
+            var(--tile-size) / -2
+        );
+
+    background:
+
+        var(--border);
+
+    clip-path:
+
+        polygon(
+
+            29% 0%,
+
+            71% 0%,
+
+            100% 29%,
+
+            100% 71%,
+
+            71% 100%,
+
+            29% 100%,
+
+            0% 71%,
+
+            0% 29%
+
+        );
+
+    transform:
+
+        translate(
+            var(--x),
+            var(--y)
+        );
+
+    transform-origin:
+        center center;
+
+    cursor: pointer;
+
+    pointer-events: auto;
+
+    transition:
+
+        transform 0.12s ease,
+
+        background 0.12s ease,
+
+        filter 0.12s ease,
+
+        box-shadow 0.12s ease;
+
+}
+
+
+/* ==========================================================
+   INTÉRIEUR DES CASES
+   ========================================================== */
+
+.tile::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 2px;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #0d161e,
+            #091017
+        );
+
+    clip-path: inherit;
+
+}
+
+
+/* ==========================================================
+   CONTOUR DES CASES
+   ========================================================== */
+
+.tile::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 6px;
+
+    border:
+        1px solid
+        rgba(
+            0,
+            229,
+            255,
+            0.08
+        );
+
+    clip-path: inherit;
+
+}
+
+
+/* ==========================================================
+   COULEUR DE FOND DES CASES PAR JOUEUR
+   ========================================================== */
+
+.tile.player-1 {
+
+    background:
+        var(--cyan);
+
+}
+
+
+.tile.player-2 {
+
+    background:
+        var(--green);
+
+}
+
+
+.tile.player-3 {
+
+    background:
+        var(--yellow);
+
+}
+
+
+.tile.player-4 {
+
+    background:
+        var(--red);
+
+}
+
+
+.tile.player-5 {
+
+    background:
+        var(--orange);
+
+}
+
+
+.tile.player-6 {
+
+    background:
+        var(--magenta);
+
+}
+
+
+.tile.player-7 {
+
+    background:
+        var(--violet);
+
+}
+
+
+.tile.player-8 {
+
+    background:
+        var(--blue);
+
+}
+
+
+/* ==========================================================
+   INTÉRIEUR COLORÉ DES TERRAINS
+   ========================================================== */
+
+.tile.player-1::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                0,
+                229,
+                255,
+                0.25
+            ),
+            #091820
+        );
+
+}
+
+
+.tile.player-2::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                0,
+                255,
+                153,
+                0.25
+            ),
+            #091b16
+        );
+
+}
+
+
+.tile.player-3::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                255,
+                230,
+                0,
+                0.25
+            ),
+            #1b1909
+        );
+
+}
+
+
+.tile.player-4::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                255,
+                64,
+                87,
+                0.25
+            ),
+            #1b090d
+        );
+
+}
+
+
+.tile.player-5::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                255,
+                138,
+                0,
+                0.25
+            ),
+            #1b1208
+        );
+
+}
+
+
+.tile.player-6::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                255,
+                59,
+                212,
+                0.25
+            ),
+            #1b0917
+        );
+
+}
+
+
+.tile.player-7::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                168,
+                85,
+                255,
+                0.25
+            ),
+            #14091e
+        );
+
+}
+
+
+.tile.player-8::before {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                61,
+                139,
+                255,
+                0.25
+            ),
+            #091321
+        );
+
+}
+
+
+/* ==========================================================
+   HOVER DES CASES
    ========================================================== */
 
 .tile:hover {
@@ -630,7 +860,7 @@ h1 span {
             var(--y)
         )
 
-        scale(1.035);
+        scale(1.08);
 
     background:
         var(--player-color);
@@ -638,55 +868,184 @@ h1 span {
     filter:
 
         drop-shadow(
-            0 0 7px
+            0 0 8px
             var(--player-color)
         );
 
-    z-index: 80;
+    z-index: 50;
+
+}
+
+
+.tile:hover::before {
+
+    background:
+        rgba(
+            16,
+            36,
+            46,
+            0.72
+        );
 
 }
 
 
 /* ==========================================================
-   SÉLECTION
+   CASE SÉLECTIONNÉE
    ========================================================== */
+
+/*
+   IMPORTANT :
+
+   La case conserve la couleur de son joueur
+   grâce à --player-color.
+
+   Elle devient simplement beaucoup plus intense.
+*/
 
 .tile.selected {
 
-    transform:
+    background:
+        var(--player-color);
 
-        translate(
-            var(--x),
-            var(--y)
+    filter:
+
+        brightness(1.55)
+
+        saturate(1.45)
+
+        drop-shadow(
+            0 0 8px
+            var(--player-color)
         )
 
-        scale(1.045);
+        drop-shadow(
+            0 0 18px
+            var(--player-color)
+        );
+
+    box-shadow:
+
+        inset 0 0 0 2px
+        rgba(
+            255,
+            255,
+            255,
+            0.9
+        ),
+
+        0 0 12px
+        var(--player-color),
+
+        0 0 28px
+        var(--player-color);
+
+    z-index: 60;
+
+}
+
+
+.tile.selected::before {
 
     background:
-        var(--green);
+
+        var(--player-color);
+
+    opacity: 0.9;
+
+}
+
+
+.tile.selected::after {
+
+    inset: 4px;
+
+    border:
+        2px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+
+}
+
+
+/* ==========================================================
+   CENTRE
+   ========================================================== */
+
+.center-tile {
+
+    --radius: 0px;
+
+    --angle: 0deg;
+
+    --player-color:
+        var(--cyan);
+
+    background:
+        var(--cyan);
 
     filter:
 
         drop-shadow(
-            0 0 10px
-            var(--green)
+            0 0 18px
+            rgba(
+                0,
+                229,
+                255,
+                0.65
+            )
         );
 
-    z-index: 90;
+    z-index: 20;
 
 }
 
 
-.tile.selected .tile-number {
+.center-tile::before {
 
-    color:
-        #02140d;
+    background:
+
+        radial-gradient(
+            circle,
+            #12313b,
+            #09202a
+        );
 
 }
 
 
 /* ==========================================================
-   OBSTACLE
+   CENTRE SÉLECTIONNÉ
+   ========================================================== */
+
+.center-tile.selected {
+
+    background:
+        var(--cyan);
+
+    filter:
+
+        brightness(1.55)
+
+        drop-shadow(
+            0 0 12px
+            var(--cyan)
+        )
+
+        drop-shadow(
+            0 0 28px
+            var(--cyan)
+        );
+
+}
+
+
+/* ==========================================================
+   OBSTACLES
    ========================================================== */
 
 .tile.obstacle {
@@ -694,8 +1053,28 @@ h1 span {
     background:
         #343d44;
 
-    filter:
-        saturate(.25);
+}
+
+
+.tile.obstacle::before {
+
+    background:
+        #171c21;
+
+}
+
+
+.tile.obstacle::after {
+
+    background:
+
+        linear-gradient(
+            45deg,
+            transparent 42%,
+            #38444d 43%,
+            #38444d 57%,
+            transparent 58%
+        );
 
 }
 
@@ -705,184 +1084,94 @@ h1 span {
     background:
         var(--red);
 
-    filter:
-
-        drop-shadow(
-            0 0 7px
-            var(--red)
-        );
-
 }
 
 
 /* ==========================================================
-   MARQUE OBSTACLE
+   COULEURS DES LABELS DE SECTEURS
    ========================================================== */
 
-.obstacle-mark {
-
-    position: absolute;
-
-    left: 50%;
-
-    top: 50%;
-
-    transform:
-        translate(
-            -50%,
-            -50%
-        );
-
-    color:
-        #0a0e12;
-
-    font-size: 18px;
-
-    pointer-events: none;
-
-}
-
-
-/* ==========================================================
-   HINT
-   ========================================================== */
-
-.hint {
-
-    position: absolute;
-
-    bottom: 72px;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    color: var(--muted);
-
-    font-size: 9px;
-
-    letter-spacing: 0.18em;
-
-    white-space: nowrap;
-
-    z-index: 20;
-
-}
-
-
-.hint span {
+.sector-1 .sector-label {
 
     color:
         var(--cyan);
 
-    margin-right: 6px;
-
 }
 
 
-/* ==========================================================
-   NOTIFICATION
-   ========================================================== */
-
-.notification {
-
-    position: fixed;
-
-    left: 50%;
-
-    bottom: 90px;
-
-    transform:
-        translate(
-            -50%,
-            15px
-        );
-
-    padding:
-        10px 18px;
+.sector-2 .sector-label {
 
     color:
-        var(--cyan);
-
-    background:
-        rgba(
-            5,
-            12,
-            17,
-            .96
-        );
-
-    border:
-        1px solid
-        var(--cyan);
-
-    box-shadow:
-
-        0 0 15px
-        rgba(
-            0,
-            229,
-            255,
-            .15
-        );
-
-    font-size: 9px;
-
-    letter-spacing: .14em;
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition:
-
-        opacity .18s ease,
-
-        transform .18s ease;
-
-    z-index: 1000;
+        var(--green);
 
 }
 
 
-.notification.visible {
+.sector-3 .sector-label {
 
-    opacity: 1;
+    color:
+        var(--yellow);
 
-    transform:
-        translate(
-            -50%,
-            0
-        );
+}
+
+
+.sector-4 .sector-label {
+
+    color:
+        var(--red);
+
+}
+
+
+.sector-5 .sector-label {
+
+    color:
+        var(--orange);
+
+}
+
+
+.sector-6 .sector-label {
+
+    color:
+        var(--magenta);
+
+}
+
+
+.sector-7 .sector-label {
+
+    color:
+        var(--violet);
+
+}
+
+
+.sector-8 .sector-label {
+
+    color:
+        var(--blue);
 
 }
 
 
 /* ==========================================================
-   MENUS LATÉRAUX
+   MENUS EDGE
    ========================================================== */
 
 .edge-menu {
 
     position: fixed;
 
+    z-index: 100;
+
     background:
 
-        linear-gradient(
-            180deg,
-            rgba(
-                10,
-                16,
-                23,
-                .98
-            ),
-            rgba(
-                5,
-                10,
-                15,
-                .98
-            )
+        rgba(
+            7,
+            13,
+            19,
+            0.97
         );
 
     border:
@@ -891,54 +1180,23 @@ h1 span {
 
     box-shadow:
 
-        0 0 25px
+        0 0 40px
         rgba(
             0,
             0,
             0,
-            .55
+            0.6
         );
 
-    z-index: 500;
-
     transition:
-        transform .2s ease;
 
-}
-
-
-.menu-inner {
-
-    width: 100%;
-
-    height: 100%;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 6px;
-
-    padding:
-        12px 18px;
-
-}
-
-
-.menu-inner.vertical {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: stretch;
-
-    justify-content: flex-start;
-
-    gap: 3px;
-
-    padding:
-        25px;
+        transform 0.3s
+        cubic-bezier(
+            0.2,
+            0.8,
+            0.2,
+            1
+        );
 
 }
 
@@ -979,6 +1237,7 @@ h1 span {
 .menu-top:hover {
 
     transform:
+
         translate(
             -50%,
             0
@@ -1008,6 +1267,7 @@ h1 span {
         var(--cyan);
 
     box-shadow:
+
         0 0 10px
         var(--cyan);
 
@@ -1050,6 +1310,7 @@ h1 span {
 .menu-bottom:hover {
 
     transform:
+
         translate(
             -50%,
             0
@@ -1079,6 +1340,7 @@ h1 span {
         var(--cyan);
 
     box-shadow:
+
         0 0 10px
         var(--cyan);
 
@@ -1117,6 +1379,7 @@ h1 span {
 .menu-left:hover {
 
     transform:
+
         translate(
             0,
             -50%
@@ -1146,6 +1409,7 @@ h1 span {
         var(--cyan);
 
     box-shadow:
+
         0 0 10px
         var(--cyan);
 
@@ -1184,6 +1448,7 @@ h1 span {
 .menu-right:hover {
 
     transform:
+
         translate(
             0,
             -50%
@@ -1213,6 +1478,7 @@ h1 span {
         var(--cyan);
 
     box-shadow:
+
         0 0 10px
         var(--cyan);
 
@@ -1220,7 +1486,49 @@ h1 span {
 
 
 /* ==========================================================
-   LOGO
+   CONTENU DES MENUS
+   ========================================================== */
+
+.menu-inner {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content:
+        space-evenly;
+
+    padding:
+        0 20px;
+
+}
+
+
+.menu-inner.vertical {
+
+    flex-direction:
+        column;
+
+    align-items:
+        stretch;
+
+    justify-content:
+        center;
+
+    gap: 10px;
+
+    padding:
+        35px 25px;
+
+}
+
+
+/* ==========================================================
+   LOGO MENU
    ========================================================== */
 
 .game-logo {
@@ -1233,9 +1541,7 @@ h1 span {
     font-weight: bold;
 
     letter-spacing:
-        .1em;
-
-    margin-right: auto;
+        0.1em;
 
 }
 
@@ -1253,6 +1559,8 @@ h1 span {
    ========================================================== */
 
 button {
+
+    appearance: none;
 
     border:
         1px solid
@@ -1273,12 +1581,12 @@ button {
     font-size: 9px;
 
     letter-spacing:
-        .14em;
+        0.14em;
 
     cursor: pointer;
 
     transition:
-        all .15s ease;
+        all 0.15s ease;
 
 }
 
@@ -1292,12 +1600,33 @@ button:hover {
         var(--border-light);
 
     background:
+
         rgba(
             0,
             229,
             255,
-            .05
+            0.05
         );
+
+}
+
+
+button:active {
+
+    transform:
+        translateY(1px);
+
+}
+
+
+button:focus-visible {
+
+    outline:
+        1px solid
+        var(--cyan);
+
+    outline-offset:
+        2px;
 
 }
 
@@ -1342,7 +1671,7 @@ button.primary:hover {
     font-size: 9px;
 
     letter-spacing:
-        .25em;
+        0.25em;
 
     padding-bottom:
         12px;
@@ -1378,8 +1707,6 @@ button.primary:hover {
 
     height: 42px;
 
-    flex-shrink: 0;
-
     display: grid;
 
     place-items: center;
@@ -1396,6 +1723,7 @@ button.primary:hover {
     clip-path:
 
         polygon(
+
             29% 0%,
             71% 0%,
             100% 29%,
@@ -1404,6 +1732,7 @@ button.primary:hover {
             29% 100%,
             0% 71%,
             0% 29%
+
         );
 
 }
@@ -1464,6 +1793,7 @@ button.primary:hover {
         var(--green);
 
     box-shadow:
+
         0 0 9px
         var(--green);
 
@@ -1477,18 +1807,105 @@ button.primary:hover {
 
     font-size: 9px;
 
-    letter-spacing:
-        .12em;
-
 }
 
 
 .stat strong {
 
     color:
-        var(--text);
+        var(--cyan);
 
-    margin-left: 5px;
+    font-weight:
+        normal;
+
+}
+
+
+/* ==========================================================
+   INDICATION
+   ========================================================== */
+
+.hint {
+
+    position: absolute;
+
+    bottom: 75px;
+
+    color:
+        var(--muted);
+
+    font-size: 8px;
+
+    letter-spacing:
+        0.25em;
+
+}
+
+
+.hint span {
+
+    color:
+        var(--cyan);
+
+}
+
+
+/* ==========================================================
+   NOTIFICATION
+   ========================================================== */
+
+.notification {
+
+    position: fixed;
+
+    z-index: 300;
+
+    top: 25px;
+
+    left: 50%;
+
+    padding:
+        10px 18px;
+
+    border:
+        1px solid
+        var(--cyan);
+
+    background:
+
+        rgba(
+            5,
+            8,
+            12,
+            0.96
+        );
+
+    color:
+        var(--cyan);
+
+    font-size: 9px;
+
+    transform:
+
+        translate(
+            -50%,
+            -100px
+        );
+
+    transition:
+        transform 0.25s ease;
+
+}
+
+
+.notification.show {
+
+    transform:
+
+        translate(
+            -50%,
+            0
+        );
 
 }
 
@@ -1497,56 +1914,48 @@ button.primary:hover {
    RESPONSIVE
    ========================================================== */
 
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
 
     :root {
 
-        --tile-size: 40px;
+        --tile-size: 38px;
 
-        --tile-step: 38px;
+        --tile-step: 36px;
 
-        --board-size: 600px;
+        --board-size: 540px;
+
+    }
+
+
+    .board {
+
+        max-width:
+            calc(100vw - 70px);
+
+        max-height:
+            calc(100vh - 150px);
 
     }
 
-    .menu-left,
-    .menu-right {
 
-        width: 210px;
+    .sector-label {
+
+        margin-top: -275px;
 
     }
+
 
     .game-header {
 
-        width: 65vw;
+        width: 75vw;
 
     }
 
-}
-
-
-@media (max-width: 850px) {
-
-    :root {
-
-        --tile-size: 36px;
-
-        --tile-step: 34px;
-
-        --board-size: 520px;
-
-    }
 
     .menu-left,
     .menu-right {
 
         width: 190px;
-
-    }
-
-    .game-header {
-
-        width: 60vw;
 
     }
 
@@ -1557,56 +1966,53 @@ button.primary:hover {
 
     :root {
 
-        --tile-size: 32px;
+        --tile-size: 34px;
 
-        --tile-step: 30px;
+        --tile-step: 32px;
 
-    }
-
-    .board-container {
-
-        width: 100vw;
-
-        height: 76vh;
+        --board-size: 470px;
 
     }
+
 
     .board {
 
-        width:
-            min(
-                88vw,
-                70vh
-            );
+        max-width:
+            calc(100vw - 40px);
 
-        height:
-            min(
-                88vw,
-                70vh
-            );
+        max-height:
+            calc(100vh - 130px);
 
     }
+
+
+    .sector-label {
+
+        margin-top: -235px;
+
+        font-size: 7px;
+
+    }
+
 
     .game-header {
 
-        top: 70px;
-
-        width: 80vw;
+        width: 82vw;
 
     }
+
 
     .game-header h1 {
 
-        font-size: 21px;
+        font-size: 20px;
 
     }
+
 
     .menu-left,
     .menu-right {
 
         width: 170px;
-
-        height: 330px;
 
     }
 
@@ -1615,78 +2021,25 @@ button.primary:hover {
 
 @media (max-height: 700px) {
 
-    :root {
-
-        --tile-size: 36px;
-
-        --tile-step: 34px;
-
-        --board-size: 560px;
-
-    }
-
     .game-header {
 
-        top: 65px;
+        top: 68px;
 
     }
 
-}
 
+    .board {
 
-@media (max-height: 580px) {
-
-    :root {
-
-        --tile-size: 30px;
-
-        --tile-step: 28px;
-
-        --board-size: 450px;
+        transform:
+            scale(0.82);
 
     }
 
-    .game-header {
-
-        top: 58px;
-
-    }
 
     .hint {
 
-        bottom: 60px;
+        bottom: 65px;
 
     }
-
-}
-
-
-/* ==========================================================
-   FOCUS
-   ========================================================== */
-
-button:focus-visible {
-
-    outline:
-        1px solid
-        var(--cyan);
-
-    outline-offset:
-        2px;
-
-}
-
-
-/* ==========================================================
-   SÉLECTION TEXTE
-   ========================================================== */
-
-::selection {
-
-    background:
-        var(--cyan);
-
-    color:
-        #041016;
 
 }
