@@ -4,25 +4,17 @@
    v1.0
    ========================================================== */
 
-
-/* ==========================================================
-   VARIABLES
-   ========================================================== */
-
 :root {
 
     --background: #05080c;
 
     --panel: #0a1017;
-
     --panel-light: #0f1821;
 
     --border: #263743;
-
     --border-light: #334a58;
 
     --text: #dce7ec;
-
     --muted: #657783;
 
 
@@ -31,19 +23,13 @@
        ====================================================== */
 
     --cyan: #00e5ff;
-
     --green: #00ff99;
-
     --yellow: #ffe600;
-
     --red: #ff4057;
 
     --orange: #ff8a00;
-
     --magenta: #ff3bd4;
-
     --violet: #a855ff;
-
     --blue: #3d8bff;
 
 
@@ -52,9 +38,7 @@
        ====================================================== */
 
     --tile-size: 42px;
-
     --tile-step: 40px;
-
     --board-size: 620px;
 
 
@@ -72,9 +56,7 @@
    ========================================================== */
 
 * {
-
     box-sizing: border-box;
-
 }
 
 
@@ -82,7 +64,6 @@ html,
 body {
 
     width: 100%;
-
     height: 100%;
 
     margin: 0;
@@ -113,7 +94,7 @@ body {
 
 
 /* ==========================================================
-   ZONE DE JEU
+   GAME
    ========================================================== */
 
 .game {
@@ -121,13 +102,11 @@ body {
     position: relative;
 
     width: 100vw;
-
     height: 100vh;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
 }
@@ -145,19 +124,22 @@ body {
 
     left: 50%;
 
-    width: min(
-        900px,
-        70vw
-    );
+    width:
+        min(
+            900px,
+            70vw
+        );
 
     transform:
         translateX(-50%);
 
     display: flex;
 
-    justify-content: space-between;
+    justify-content:
+        space-between;
 
-    align-items: flex-end;
+    align-items:
+        flex-end;
 
     z-index: 10;
 
@@ -166,82 +148,100 @@ body {
 
 .sector {
 
-    color: var(--cyan);
+    color:
+        var(--cyan);
 
     font-size: 9px;
 
-    letter-spacing: 0.3em;
+    letter-spacing:
+        0.3em;
 
 }
 
 
 h1 {
 
-    margin: 5px 0 0;
+    margin:
+        5px 0 0;
 
-    color: var(--text);
+    color:
+        var(--text);
 
-    font-size: 28px;
+    font-size:
+        28px;
 
-    font-weight: normal;
+    font-weight:
+        normal;
 
-    letter-spacing: 0.15em;
+    letter-spacing:
+        0.15em;
 
 }
 
 
 h1 span {
 
-    color: var(--cyan);
+    color:
+        var(--cyan);
 
 }
 
 
 .coordinates {
 
-    color: var(--muted);
+    color:
+        var(--muted);
 
-    font-size: 10px;
+    font-size:
+        10px;
 
-    letter-spacing: 0.15em;
+    letter-spacing:
+        0.15em;
 
 }
 
 
 /* ==========================================================
-   CONTENEUR DU PLATEAU
+   BOARD CONTAINER
    ========================================================== */
 
 .board-container {
 
     position: relative;
 
-    width: 80vw;
+    width:
+        80vw;
 
-    height: 72vh;
+    height:
+        72vh;
 
     display: flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: center;
+    justify-content:
+        center;
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
 }
 
 
 /* ==========================================================
-   PLATEAU
+   BOARD
    ========================================================== */
 
 .board {
 
     position: relative;
 
-    width: var(--board-size);
+    width:
+        var(--board-size);
 
-    height: var(--board-size);
+    height:
+        var(--board-size);
 
     max-width:
         min(
@@ -255,9 +255,11 @@ h1 span {
             calc(100vh - 170px)
         );
 
-    aspect-ratio: 1 / 1;
+    aspect-ratio:
+        1 / 1;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
     background:
 
@@ -295,7 +297,7 @@ h1 span {
 
 
 /* ==========================================================
-   AXES DES 8 SECTEURS
+   SECTEURS
    ========================================================== */
 
 .board::before {
@@ -306,7 +308,8 @@ h1 span {
 
     inset: 0;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
     background:
 
@@ -318,7 +321,7 @@ h1 span {
                 0,
                 229,
                 255,
-                0.14
+                0.10
             )
             0deg 1px,
 
@@ -327,16 +330,14 @@ h1 span {
 
         );
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
-    z-index: 1;
+    z-index:
+        1;
 
 }
 
-
-/* ==========================================================
-   INDICATIONS RADIALES
-   ========================================================== */
 
 .board::after {
 
@@ -346,7 +347,8 @@ h1 span {
 
     inset: 72px;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
     border:
         1px solid
@@ -354,7 +356,7 @@ h1 span {
             0,
             229,
             255,
-            0.07
+            0.05
         );
 
     box-shadow:
@@ -364,7 +366,7 @@ h1 span {
             0,
             229,
             255,
-            0.018
+            0.012
         ),
 
         0 0 0 128px
@@ -372,7 +374,7 @@ h1 span {
             0,
             229,
             255,
-            0.018
+            0.012
         ),
 
         0 0 0 192px
@@ -380,185 +382,151 @@ h1 span {
             0,
             229,
             255,
-            0.018
+            0.012
         );
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
-    z-index: 1;
+    z-index:
+        1;
 
 }
 
 
 /* ==========================================================
-   SECTEURS
+   SECTOR LAYERS
    ========================================================== */
 
 .sector-layer {
 
-    position: absolute;
+    position:
+        absolute;
 
-    inset: 0;
+    inset:
+        0;
 
-    z-index: 5;
+    z-index:
+        5;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
 }
 
 
-/* ==========================================================
-   LABELS JOUEURS
-   ========================================================== */
-
 .sector-label {
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 50%;
+    left:
+        50%;
 
-    top: 50%;
+    top:
+        50%;
 
-    width: 115px;
+    width:
+        115px;
 
-    margin-top: -350px;
+    margin-top:
+        -350px;
 
     transform:
         translateX(-50%);
 
-    text-align: center;
+    text-align:
+        center;
 
     color:
         rgba(
             220,
             231,
             236,
-            0.35
+            0.25
         );
 
-    font-size: 8px;
+    font-size:
+        8px;
 
     letter-spacing:
         0.18em;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
 }
 
 
 /* ==========================================================
-   COULEURS DES 8 TERRAINS
+   PLAYER COLORS
    ========================================================== */
 
 .player-1 {
-
     --player-color:
         var(--cyan);
-
 }
-
 
 .player-2 {
-
     --player-color:
         var(--green);
-
 }
-
 
 .player-3 {
-
     --player-color:
         var(--yellow);
-
 }
-
 
 .player-4 {
-
     --player-color:
         var(--red);
-
 }
-
 
 .player-5 {
-
     --player-color:
         var(--orange);
-
 }
-
 
 .player-6 {
-
     --player-color:
         var(--magenta);
-
 }
-
 
 .player-7 {
-
     --player-color:
         var(--violet);
-
 }
 
-
 .player-8 {
-
     --player-color:
         var(--blue);
-
 }
 
 
 /* ==========================================================
-   CASE OCTOGONALE
+   TILE
    ========================================================== */
 
 .tile {
 
-    position: absolute;
+    position:
+        absolute;
 
-    top: 50%;
+    top:
+        50%;
 
-    left: 50%;
+    left:
+        50%;
 
-    width: var(--tile-size);
+    width:
+        var(--tile-size);
 
-    height: var(--tile-size);
+    height:
+        var(--tile-size);
 
     margin:
         calc(
             var(--tile-size) / -2
-        );
-
-    background:
-
-        var(--border);
-
-    clip-path:
-
-        polygon(
-
-            29% 0%,
-
-            71% 0%,
-
-            100% 29%,
-
-            100% 71%,
-
-            71% 100%,
-
-            29% 100%,
-
-            0% 71%,
-
-            0% 29%
-
         );
 
     transform:
@@ -568,287 +536,429 @@ h1 span {
             var(--y)
         );
 
-    transform-origin:
-        center center;
+    clip-path:
 
-    cursor: pointer;
+        polygon(
 
-    pointer-events: auto;
+            29% 0%,
+            71% 0%,
+            100% 29%,
+            100% 71%,
+            71% 100%,
+            29% 100%,
+            0% 71%,
+            0% 29%
+
+        );
+
+    background:
+        #18242c;
+
+    cursor:
+        pointer;
+
+    z-index:
+        2;
 
     transition:
 
-        transform 0.12s ease,
+        transform
+        0.12s ease,
 
-        background 0.12s ease,
+        background
+        0.12s ease,
 
-        filter 0.12s ease,
+        filter
+        0.12s ease,
 
-        box-shadow 0.12s ease;
+        box-shadow
+        0.12s ease;
 
 }
 
 
 /* ==========================================================
-   INTÉRIEUR DES CASES
+   TILE INNER
    ========================================================== */
 
 .tile::before {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    inset: 2px;
+    inset:
+        2px;
 
     background:
+        #0b141b;
 
-        linear-gradient(
-            135deg,
-            #0d161e,
-            #091017
-        );
-
-    clip-path: inherit;
+    clip-path:
+        inherit;
 
 }
 
 
-/* ==========================================================
-   CONTOUR DES CASES
-   ========================================================== */
-
 .tile::after {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    inset: 6px;
+    inset:
+        5px;
 
     border:
         1px solid
         rgba(
-            0,
-            229,
             255,
-            0.08
+            255,
+            255,
+            0.035
         );
 
-    clip-path: inherit;
+    clip-path:
+        inherit;
 
 }
 
 
 /* ==========================================================
-   COULEUR DE FOND DES CASES PAR JOUEUR
+   CASES JOUEURS
+   INTENSITÉ NORMALE FAIBLE
    ========================================================== */
 
 .tile.player-1 {
+    background:
+        rgba(
+            0,
+            229,
+            255,
+            0.20
+        );
+}
+
+.tile.player-2 {
+    background:
+        rgba(
+            0,
+            255,
+            153,
+            0.20
+        );
+}
+
+.tile.player-3 {
+    background:
+        rgba(
+            255,
+            230,
+            0,
+            0.20
+        );
+}
+
+.tile.player-4 {
+    background:
+        rgba(
+            255,
+            64,
+            87,
+            0.20
+        );
+}
+
+.tile.player-5 {
+    background:
+        rgba(
+            255,
+            138,
+            0,
+            0.20
+        );
+}
+
+.tile.player-6 {
+    background:
+        rgba(
+            255,
+            59,
+            212,
+            0.20
+        );
+}
+
+.tile.player-7 {
+    background:
+        rgba(
+            168,
+            85,
+            255,
+            0.20
+        );
+}
+
+.tile.player-8 {
+    background:
+        rgba(
+            61,
+            139,
+            255,
+            0.20
+        );
+}
+
+
+/* ==========================================================
+   INNER COLOR
+   ========================================================== */
+
+.tile.player-1::before {
+    background:
+        rgba(
+            0,
+            229,
+            255,
+            0.06
+        );
+}
+
+.tile.player-2::before {
+    background:
+        rgba(
+            0,
+            255,
+            153,
+            0.06
+        );
+}
+
+.tile.player-3::before {
+    background:
+        rgba(
+            255,
+            230,
+            0,
+            0.06
+        );
+}
+
+.tile.player-4::before {
+    background:
+        rgba(
+            255,
+            64,
+            87,
+            0.06
+        );
+}
+
+.tile.player-5::before {
+    background:
+        rgba(
+            255,
+            138,
+            0,
+            0.06
+        );
+}
+
+.tile.player-6::before {
+    background:
+        rgba(
+            255,
+            59,
+            212,
+            0.06
+        );
+}
+
+.tile.player-7::before {
+    background:
+        rgba(
+            168,
+            85,
+            255,
+            0.06
+        );
+}
+
+.tile.player-8::before {
+    background:
+        rgba(
+            61,
+            139,
+            255,
+            0.06
+        );
+}
+
+
+/* ==========================================================
+   TILE NUMBER
+   ========================================================== */
+
+.tile-number {
+
+    position:
+        relative;
+
+    z-index:
+        3;
+
+    color:
+        rgba(
+            220,
+            231,
+            236,
+            0.45
+        );
+
+    font-size:
+        8px;
+
+    pointer-events:
+        none;
+
+}
+
+
+/* ==========================================================
+   ZONE CENTRALE SPÉCIALE
+   9 CASES
+   ========================================================== */
+
+.tile.special-tile {
 
     background:
+
+        color-mix(
+            in srgb,
+            var(--player-color)
+            26%,
+            #101a21
+        );
+
+    box-shadow:
+
+        inset 0 0 0 1px
+        color-mix(
+            in srgb,
+            var(--player-color)
+            35%,
+            transparent
+        );
+
+    z-index:
+        12;
+
+}
+
+
+.tile.special-tile::before {
+
+    background:
+
+        color-mix(
+            in srgb,
+            var(--player-color)
+            8%,
+            #0b141b
+        );
+
+}
+
+
+.tile.special-tile::after {
+
+    inset:
+        4px;
+
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--player-color)
+            30%,
+            transparent
+        );
+
+}
+
+
+/* ==========================================================
+   CENTRE
+   ========================================================== */
+
+.tile.center-tile {
+
+    --player-color:
+        var(--cyan);
+
+    background:
+
+        rgba(
+            0,
+            229,
+            255,
+            0.38
+        );
+
+    box-shadow:
+
+        inset 0 0 0 2px
+        rgba(
+            0,
+            229,
+            255,
+            0.65
+        ),
+
+        0 0 12px
+        rgba(
+            0,
+            229,
+            255,
+            0.40
+        );
+
+    z-index:
+        25;
+
+}
+
+
+.tile-center-mark {
+
+    position:
+        relative;
+
+    z-index:
+        4;
+
+    color:
+        var(--cyan);
+
+    font-size:
+        11px;
+
+    font-weight:
+        bold;
+
+    text-shadow:
+
+        0 0 8px
         var(--cyan);
 
 }
 
 
-.tile.player-2 {
-
-    background:
-        var(--green);
-
-}
-
-
-.tile.player-3 {
-
-    background:
-        var(--yellow);
-
-}
-
-
-.tile.player-4 {
-
-    background:
-        var(--red);
-
-}
-
-
-.tile.player-5 {
-
-    background:
-        var(--orange);
-
-}
-
-
-.tile.player-6 {
-
-    background:
-        var(--magenta);
-
-}
-
-
-.tile.player-7 {
-
-    background:
-        var(--violet);
-
-}
-
-
-.tile.player-8 {
-
-    background:
-        var(--blue);
-
-}
-
-
 /* ==========================================================
-   INTÉRIEUR COLORÉ DES TERRAINS
-   ========================================================== */
-
-.tile.player-1::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                0,
-                229,
-                255,
-                0.25
-            ),
-            #091820
-        );
-
-}
-
-
-.tile.player-2::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                0,
-                255,
-                153,
-                0.25
-            ),
-            #091b16
-        );
-
-}
-
-
-.tile.player-3::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                255,
-                230,
-                0,
-                0.25
-            ),
-            #1b1909
-        );
-
-}
-
-
-.tile.player-4::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                255,
-                64,
-                87,
-                0.25
-            ),
-            #1b090d
-        );
-
-}
-
-
-.tile.player-5::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                255,
-                138,
-                0,
-                0.25
-            ),
-            #1b1208
-        );
-
-}
-
-
-.tile.player-6::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                255,
-                59,
-                212,
-                0.25
-            ),
-            #1b0917
-        );
-
-}
-
-
-.tile.player-7::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                168,
-                85,
-                255,
-                0.25
-            ),
-            #14091e
-        );
-
-}
-
-
-.tile.player-8::before {
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(
-                61,
-                139,
-                255,
-                0.25
-            ),
-            #091321
-        );
-
-}
-
-
-/* ==========================================================
-   HOVER DES CASES
+   HOVER CELLULE
    ========================================================== */
 
 .tile:hover {
@@ -860,19 +970,20 @@ h1 span {
             var(--y)
         )
 
-        scale(1.08);
-
-    background:
-        var(--player-color);
+        scale(1.07);
 
     filter:
 
+        brightness(1.20)
+        saturate(1.15)
+
         drop-shadow(
-            0 0 8px
+            0 0 6px
             var(--player-color)
         );
 
-    z-index: 50;
+    z-index:
+        50;
 
 }
 
@@ -880,11 +991,12 @@ h1 span {
 .tile:hover::before {
 
     background:
-        rgba(
-            16,
-            36,
-            46,
-            0.72
+
+        color-mix(
+            in srgb,
+            var(--player-color)
+            14%,
+            #0b141b
         );
 
 }
@@ -892,16 +1004,8 @@ h1 span {
 
 /* ==========================================================
    CASE SÉLECTIONNÉE
+   INTENSITÉ FORTE
    ========================================================== */
-
-/*
-   IMPORTANT :
-
-   La case conserve la couleur de son joueur
-   grâce à --player-color.
-
-   Elle devient simplement beaucoup plus intense.
-*/
 
 .tile.selected {
 
@@ -910,9 +1014,8 @@ h1 span {
 
     filter:
 
-        brightness(1.55)
-
-        saturate(1.45)
+        brightness(1.60)
+        saturate(1.55)
 
         drop-shadow(
             0 0 8px
@@ -920,7 +1023,7 @@ h1 span {
         )
 
         drop-shadow(
-            0 0 18px
+            0 0 20px
             var(--player-color)
         );
 
@@ -931,16 +1034,17 @@ h1 span {
             255,
             255,
             255,
-            0.9
+            0.90
         ),
 
         0 0 12px
         var(--player-color),
 
-        0 0 28px
+        0 0 30px
         var(--player-color);
 
-    z-index: 60;
+    z-index:
+        60;
 
 }
 
@@ -948,17 +1052,18 @@ h1 span {
 .tile.selected::before {
 
     background:
-
         var(--player-color);
 
-    opacity: 0.9;
+    opacity:
+        0.88;
 
 }
 
 
 .tile.selected::after {
 
-    inset: 4px;
+    inset:
+        4px;
 
     border:
         2px solid
@@ -966,53 +1071,7 @@ h1 span {
             255,
             255,
             255,
-            0.75
-        );
-
-}
-
-
-/* ==========================================================
-   CENTRE
-   ========================================================== */
-
-.center-tile {
-
-    --radius: 0px;
-
-    --angle: 0deg;
-
-    --player-color:
-        var(--cyan);
-
-    background:
-        var(--cyan);
-
-    filter:
-
-        drop-shadow(
-            0 0 18px
-            rgba(
-                0,
-                229,
-                255,
-                0.65
-            )
-        );
-
-    z-index: 20;
-
-}
-
-
-.center-tile::before {
-
-    background:
-
-        radial-gradient(
-            circle,
-            #12313b,
-            #09202a
+            0.78
         );
 
 }
@@ -1022,14 +1081,15 @@ h1 span {
    CENTRE SÉLECTIONNÉ
    ========================================================== */
 
-.center-tile.selected {
+.tile.center-tile.selected {
 
     background:
         var(--cyan);
 
     filter:
 
-        brightness(1.55)
+        brightness(1.65)
+        saturate(1.55)
 
         drop-shadow(
             0 0 12px
@@ -1037,7 +1097,7 @@ h1 span {
         )
 
         drop-shadow(
-            0 0 28px
+            0 0 30px
             var(--cyan)
         );
 
@@ -1052,6 +1112,9 @@ h1 span {
 
     background:
         #343d44;
+
+    cursor:
+        not-allowed;
 
 }
 
@@ -1088,70 +1151,39 @@ h1 span {
 
 
 /* ==========================================================
-   COULEURS DES LABELS DE SECTEURS
+   SECTOR LABELS
    ========================================================== */
 
 .sector-1 .sector-label {
-
-    color:
-        var(--cyan);
-
+    color: var(--cyan);
 }
-
 
 .sector-2 .sector-label {
-
-    color:
-        var(--green);
-
+    color: var(--green);
 }
-
 
 .sector-3 .sector-label {
-
-    color:
-        var(--yellow);
-
+    color: var(--yellow);
 }
-
 
 .sector-4 .sector-label {
-
-    color:
-        var(--red);
-
+    color: var(--red);
 }
-
 
 .sector-5 .sector-label {
-
-    color:
-        var(--orange);
-
+    color: var(--orange);
 }
-
 
 .sector-6 .sector-label {
-
-    color:
-        var(--magenta);
-
+    color: var(--magenta);
 }
-
 
 .sector-7 .sector-label {
-
-    color:
-        var(--violet);
-
+    color: var(--violet);
 }
 
-
 .sector-8 .sector-label {
-
-    color:
-        var(--blue);
-
+    color: var(--blue);
 }
 
 
@@ -1161,9 +1193,11 @@ h1 span {
 
 .edge-menu {
 
-    position: fixed;
+    position:
+        fixed;
 
-    z-index: 100;
+    z-index:
+        100;
 
     background:
 
@@ -1190,7 +1224,8 @@ h1 span {
 
     transition:
 
-        transform 0.3s
+        transform
+        0.3s
         cubic-bezier(
             0.2,
             0.8,
@@ -1207,9 +1242,11 @@ h1 span {
 
 .menu-top {
 
-    top: 0;
+    top:
+        0;
 
-    left: 50%;
+    left:
+        50%;
 
     width:
         min(
@@ -1217,7 +1254,8 @@ h1 span {
             80vw
         );
 
-    height: 62px;
+    height:
+        62px;
 
     transform:
 
@@ -1229,7 +1267,8 @@ h1 span {
             )
         );
 
-    border-top: 0;
+    border-top:
+        0;
 
 }
 
@@ -1237,7 +1276,6 @@ h1 span {
 .menu-top:hover {
 
     transform:
-
         translate(
             -50%,
             0
@@ -1248,17 +1286,23 @@ h1 span {
 
 .menu-top::after {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 50%;
+    left:
+        50%;
 
-    bottom: 0;
+    bottom:
+        0;
 
-    width: 70px;
+    width:
+        70px;
 
-    height: 2px;
+    height:
+        2px;
 
     transform:
         translateX(-50%);
@@ -1267,7 +1311,6 @@ h1 span {
         var(--cyan);
 
     box-shadow:
-
         0 0 10px
         var(--cyan);
 
@@ -1280,9 +1323,11 @@ h1 span {
 
 .menu-bottom {
 
-    bottom: 0;
+    bottom:
+        0;
 
-    left: 50%;
+    left:
+        50%;
 
     width:
         min(
@@ -1290,7 +1335,8 @@ h1 span {
             80vw
         );
 
-    height: 62px;
+    height:
+        62px;
 
     transform:
 
@@ -1302,7 +1348,8 @@ h1 span {
             )
         );
 
-    border-bottom: 0;
+    border-bottom:
+        0;
 
 }
 
@@ -1310,7 +1357,6 @@ h1 span {
 .menu-bottom:hover {
 
     transform:
-
         translate(
             -50%,
             0
@@ -1321,17 +1367,23 @@ h1 span {
 
 .menu-bottom::after {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 50%;
+    left:
+        50%;
 
-    top: 0;
+    top:
+        0;
 
-    width: 70px;
+    width:
+        70px;
 
-    height: 2px;
+    height:
+        2px;
 
     transform:
         translateX(-50%);
@@ -1340,7 +1392,6 @@ h1 span {
         var(--cyan);
 
     box-shadow:
-
         0 0 10px
         var(--cyan);
 
@@ -1353,13 +1404,17 @@ h1 span {
 
 .menu-left {
 
-    top: 50%;
+    top:
+        50%;
 
-    left: 0;
+    left:
+        0;
 
-    width: 240px;
+    width:
+        240px;
 
-    height: 390px;
+    height:
+        390px;
 
     transform:
 
@@ -1371,7 +1426,8 @@ h1 span {
             -50%
         );
 
-    border-left: 0;
+    border-left:
+        0;
 
 }
 
@@ -1379,7 +1435,6 @@ h1 span {
 .menu-left:hover {
 
     transform:
-
         translate(
             0,
             -50%
@@ -1390,17 +1445,23 @@ h1 span {
 
 .menu-left::after {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    right: 0;
+    right:
+        0;
 
-    top: 50%;
+    top:
+        50%;
 
-    width: 2px;
+    width:
+        2px;
 
-    height: 70px;
+    height:
+        70px;
 
     transform:
         translateY(-50%);
@@ -1409,7 +1470,6 @@ h1 span {
         var(--cyan);
 
     box-shadow:
-
         0 0 10px
         var(--cyan);
 
@@ -1422,13 +1482,17 @@ h1 span {
 
 .menu-right {
 
-    top: 50%;
+    top:
+        50%;
 
-    right: 0;
+    right:
+        0;
 
-    width: 240px;
+    width:
+        240px;
 
-    height: 390px;
+    height:
+        390px;
 
     transform:
 
@@ -1440,7 +1504,8 @@ h1 span {
             -50%
         );
 
-    border-right: 0;
+    border-right:
+        0;
 
 }
 
@@ -1448,7 +1513,6 @@ h1 span {
 .menu-right:hover {
 
     transform:
-
         translate(
             0,
             -50%
@@ -1459,17 +1523,23 @@ h1 span {
 
 .menu-right::after {
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 0;
+    left:
+        0;
 
-    top: 50%;
+    top:
+        50%;
 
-    width: 2px;
+    width:
+        2px;
 
-    height: 70px;
+    height:
+        70px;
 
     transform:
         translateY(-50%);
@@ -1478,7 +1548,6 @@ h1 span {
         var(--cyan);
 
     box-shadow:
-
         0 0 10px
         var(--cyan);
 
@@ -1486,18 +1555,22 @@ h1 span {
 
 
 /* ==========================================================
-   CONTENU DES MENUS
+   MENU INNER
    ========================================================== */
 
 .menu-inner {
 
-    width: 100%;
+    width:
+        100%;
 
-    height: 100%;
+    height:
+        100%;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
     justify-content:
         space-evenly;
@@ -1519,7 +1592,8 @@ h1 span {
     justify-content:
         center;
 
-    gap: 10px;
+    gap:
+        10px;
 
     padding:
         35px 25px;
@@ -1536,9 +1610,11 @@ h1 span {
     color:
         var(--text);
 
-    font-size: 13px;
+    font-size:
+        13px;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 
     letter-spacing:
         0.1em;
@@ -1555,12 +1631,13 @@ h1 span {
 
 
 /* ==========================================================
-   BOUTONS
+   BUTTONS
    ========================================================== */
 
 button {
 
-    appearance: none;
+    appearance:
+        none;
 
     border:
         1px solid
@@ -1578,15 +1655,19 @@ button {
     font-family:
         inherit;
 
-    font-size: 9px;
+    font-size:
+        9px;
 
     letter-spacing:
         0.14em;
 
-    cursor: pointer;
+    cursor:
+        pointer;
 
     transition:
-        all 0.15s ease;
+        all
+        0.15s
+        ease;
 
 }
 
@@ -1660,7 +1741,7 @@ button.primary:hover {
 
 
 /* ==========================================================
-   TITRE MENU
+   MENU TITLE
    ========================================================== */
 
 .menu-title {
@@ -1668,7 +1749,8 @@ button.primary:hover {
     color:
         var(--cyan);
 
-    font-size: 9px;
+    font-size:
+        9px;
 
     letter-spacing:
         0.25em;
@@ -1689,11 +1771,14 @@ button.primary:hover {
 
 .player {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 12px;
+    gap:
+        12px;
 
     padding:
         12px 0;
@@ -1703,13 +1788,17 @@ button.primary:hover {
 
 .player-avatar {
 
-    width: 42px;
+    width:
+        42px;
 
-    height: 42px;
+    height:
+        42px;
 
-    display: grid;
+    display:
+        grid;
 
-    place-items: center;
+    place-items:
+        center;
 
     color:
         var(--cyan);
@@ -1718,12 +1807,12 @@ button.primary:hover {
         1px solid
         var(--cyan);
 
-    font-size: 9px;
+    font-size:
+        9px;
 
     clip-path:
 
         polygon(
-
             29% 0%,
             71% 0%,
             100% 29%,
@@ -1732,7 +1821,6 @@ button.primary:hover {
             29% 100%,
             0% 71%,
             0% 29%
-
         );
 
 }
@@ -1740,23 +1828,28 @@ button.primary:hover {
 
 .player-info strong {
 
-    display: block;
+    display:
+        block;
 
-    font-size: 9px;
+    font-size:
+        9px;
 
 }
 
 
 .player-info span {
 
-    display: block;
+    display:
+        block;
 
-    margin-top: 5px;
+    margin-top:
+        5px;
 
     color:
         var(--green);
 
-    font-size: 8px;
+    font-size:
+        8px;
 
 }
 
@@ -1767,33 +1860,39 @@ button.primary:hover {
 
 .game-status {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 8px;
+    gap:
+        8px;
 
     color:
         var(--green);
 
-    font-size: 9px;
+    font-size:
+        9px;
 
 }
 
 
 .status-light {
 
-    width: 6px;
+    width:
+        6px;
 
-    height: 6px;
+    height:
+        6px;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
     background:
         var(--green);
 
     box-shadow:
-
         0 0 9px
         var(--green);
 
@@ -1805,7 +1904,8 @@ button.primary:hover {
     color:
         var(--muted);
 
-    font-size: 9px;
+    font-size:
+        9px;
 
 }
 
@@ -1822,19 +1922,22 @@ button.primary:hover {
 
 
 /* ==========================================================
-   INDICATION
+   HINT
    ========================================================== */
 
 .hint {
 
-    position: absolute;
+    position:
+        absolute;
 
-    bottom: 75px;
+    bottom:
+        75px;
 
     color:
         var(--muted);
 
-    font-size: 8px;
+    font-size:
+        8px;
 
     letter-spacing:
         0.25em;
@@ -1856,13 +1959,17 @@ button.primary:hover {
 
 .notification {
 
-    position: fixed;
+    position:
+        fixed;
 
-    z-index: 300;
+    z-index:
+        300;
 
-    top: 25px;
+    top:
+        25px;
 
-    left: 50%;
+    left:
+        50%;
 
     padding:
         10px 18px;
@@ -1883,25 +1990,26 @@ button.primary:hover {
     color:
         var(--cyan);
 
-    font-size: 9px;
+    font-size:
+        9px;
 
     transform:
-
         translate(
             -50%,
             -100px
         );
 
     transition:
-        transform 0.25s ease;
+        transform
+        0.25s
+        ease;
 
 }
 
 
-.notification.show {
+.notification.visible {
 
     transform:
-
         translate(
             -50%,
             0
@@ -1918,11 +2026,14 @@ button.primary:hover {
 
     :root {
 
-        --tile-size: 38px;
+        --tile-size:
+            38px;
 
-        --tile-step: 36px;
+        --tile-step:
+            36px;
 
-        --board-size: 540px;
+        --board-size:
+            540px;
 
     }
 
@@ -1930,24 +2041,30 @@ button.primary:hover {
     .board {
 
         max-width:
-            calc(100vw - 70px);
+            calc(
+                100vw - 70px
+            );
 
         max-height:
-            calc(100vh - 150px);
+            calc(
+                100vh - 150px
+            );
 
     }
 
 
     .sector-label {
 
-        margin-top: -275px;
+        margin-top:
+            -275px;
 
     }
 
 
     .game-header {
 
-        width: 75vw;
+        width:
+            75vw;
 
     }
 
@@ -1955,7 +2072,8 @@ button.primary:hover {
     .menu-left,
     .menu-right {
 
-        width: 190px;
+        width:
+            190px;
 
     }
 
@@ -1966,11 +2084,14 @@ button.primary:hover {
 
     :root {
 
-        --tile-size: 34px;
+        --tile-size:
+            34px;
 
-        --tile-step: 32px;
+        --tile-step:
+            32px;
 
-        --board-size: 470px;
+        --board-size:
+            470px;
 
     }
 
@@ -1978,33 +2099,41 @@ button.primary:hover {
     .board {
 
         max-width:
-            calc(100vw - 40px);
+            calc(
+                100vw - 40px
+            );
 
         max-height:
-            calc(100vh - 130px);
+            calc(
+                100vh - 130px
+            );
 
     }
 
 
     .sector-label {
 
-        margin-top: -235px;
+        margin-top:
+            -235px;
 
-        font-size: 7px;
+        font-size:
+            7px;
 
     }
 
 
     .game-header {
 
-        width: 82vw;
+        width:
+            82vw;
 
     }
 
 
     .game-header h1 {
 
-        font-size: 20px;
+        font-size:
+            20px;
 
     }
 
@@ -2012,7 +2141,8 @@ button.primary:hover {
     .menu-left,
     .menu-right {
 
-        width: 170px;
+        width:
+            170px;
 
     }
 
@@ -2023,7 +2153,8 @@ button.primary:hover {
 
     .game-header {
 
-        top: 68px;
+        top:
+            68px;
 
     }
 
@@ -2038,7 +2169,8 @@ button.primary:hover {
 
     .hint {
 
-        bottom: 65px;
+        bottom:
+            65px;
 
     }
 
