@@ -1980,3 +1980,40 @@ console.log(
 console.log(
     "8 joueurs · 8 secteurs · grille octogonale · rotation libre"
 );
+
+/* ============================================================
+   SELECTEUR DE VERSION
+   ============================================================ */
+
+const versionSelect =
+    document.getElementById(
+        "versionSelect"
+    );
+
+
+if (
+    versionSelect
+) {
+
+    versionSelect.addEventListener(
+        "change",
+        event => {
+
+            const target =
+                event.target.value;
+
+
+            if (
+                target
+            ) {
+
+                window.location.href =
+                    target;
+
+            }
+
+        }
+    );
+
+}
+
