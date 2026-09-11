@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>88_AN0THER_G4ME</title>
+
+    <link
+        rel="stylesheet"
+        href="index.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ======================================================
+         MENU HAUT
+         ====================================================== -->
+
+    <nav
+        id="menuTop"
+        class="edge-menu menu-top"
+    >
+
+        <div class="menu-inner">
+
+            <div class="game-logo">
+                88<span>_AN0THER</span>_G4ME
+            </div>
+
+
+            <button
+                data-action="new"
+                type="button"
+            >
+                NEW GAME
+            </button>
+
+
+            <button
+                data-action="save"
+                type="button"
+            >
+                SAVE
+            </button>
+
+
+            <button
+                data-action="settings"
+                type="button"
+            >
+                SETTINGS
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ======================================================
+         MENU GAUCHE
+         ====================================================== -->
+
+    <nav
+        id="menuLeft"
+        class="edge-menu menu-left"
+    >
+
+        <div class="menu-inner vertical">
+
+            <div class="menu-title">
+                PLAYER
+            </div>
+
+
+            <div class="player">
+
+                <div class="player-avatar">
+                    3X
+                </div>
+
+
+                <div class="player-info">
+
+                    <strong>
+                        PLAYER 01
+                    </strong>
+
+                    <span>
+                        ONLINE
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                data-action="inventory"
+                type="button"
+            >
+                INVENTORY
+            </button>
+
+
+            <button
+                data-action="map"
+                type="button"
+            >
+                MAP
+            </button>
+
+
+            <button
+                data-action="stats"
+                type="button"
+            >
+                STATISTICS
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ======================================================
+         MENU DROITE
+         ====================================================== -->
+
+    <nav
+        id="menuRight"
+        class="edge-menu menu-right"
+    >
+
+        <div class="menu-inner vertical">
+
+            <div class="menu-title">
+                ACTIONS
+            </div>
+
+
+            <button
+                class="primary"
+                data-action="action"
+                type="button"
+            >
+                ACTION
+            </button>
+
+
+            <button
+                data-action="end"
+                type="button"
+            >
+                END TURN
+            </button>
+
+
+            <button
+                data-action="reset"
+                type="button"
+            >
+                RESET
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ======================================================
+         MENU BAS
+         ====================================================== -->
+
+    <nav
+        id="menuBottom"
+        class="edge-menu menu-bottom"
+    >
+
+        <div class="menu-inner">
+
+            <div class="game-status">
+
+                <span class="status-light"></span>
+
+                <span>
+                    GAME ACTIVE
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                TURN
+
+                <strong id="turn">
+                    01
+                </strong>
+
+            </div>
+
+
+            <div class="stat">
+
+                SCORE
+
+                <strong id="score">
+                    000
+                </strong>
+
+            </div>
+
+
+            <div
+                id="action"
+                class="stat action-status"
+            >
+                SELECT A TILE
+            </div>
+
+
+            <button
+                data-action="help"
+                type="button"
+            >
+                HELP
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ======================================================
+         JEU
+         ====================================================== -->
+
+    <main class="game">
+
+
+        <!-- ==================================================
+             HEADER
+             ================================================== -->
+
+        <header class="game-header">
+
+            <div>
+
+                <div class="sector">
+                    OCTO MAP
+                </div>
+
+                <h1>
+                    OCTO<span>GRID</span>
+                </h1>
+
+            </div>
+
+
+            <div
+                id="coordinates"
+                class="coordinates"
+            >
+                X: 00&nbsp;&nbsp;Y: 00
+            </div>
+
+        </header>
+
+
+        <!-- ==================================================
+             PLATEAU
+             ================================================== -->
+
+        <section class="board-container">
+
+            <div
+                id="board"
+                class="board"
+                aria-label="Plateau de jeu octogonal à 8 secteurs"
+            ></div>
+
+        </section>
+
+
+        <!-- ==================================================
+             INDICATIONS
+             ================================================== -->
+
+        <div class="hint">
+
+            <span>
+                DRAG
+            </span>
+
+            &nbsp;ROTATE MAP
+
+            &nbsp;&nbsp;·&nbsp;&nbsp;
+
+            <span>
+                CLICK
+            </span>
+
+            &nbsp;SELECT TILE
+
+        </div>
+
+
+    </main>
+
+
+    <!-- ======================================================
+         NOTIFICATION
+         ====================================================== -->
+
+    <div
+        id="notification"
+        class="notification"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+
+    <script type="module" src="index.js"></script>
+
+
+</body>
+
+</html>

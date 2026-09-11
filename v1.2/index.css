@@ -1,0 +1,2234 @@
+/* ============================================================
+   88_AN0THER_G4ME
+   OCTO GRID
+   v1.1
+   ============================================================ */
+
+
+/* ============================================================
+   VARIABLES
+   ============================================================ */
+
+:root {
+
+    --bg:
+        #05080c;
+
+    --panel:
+        #091017;
+
+    --panel-light:
+        #101a22;
+
+    --border:
+        #263943;
+
+    --border-light:
+        #3b515d;
+
+    --text:
+        #dce7ec;
+
+    --muted:
+        #687a84;
+
+
+    /* ========================================================
+       8 JOUEURS
+       ======================================================== */
+
+    --p1:
+        #00e5ff;
+
+    --p2:
+        #00ff99;
+
+    --p3:
+        #ffe600;
+
+    --p4:
+        #ff4057;
+
+    --p5:
+        #ff8a00;
+
+    --p6:
+        #ff3bd4;
+
+    --p7:
+        #a855ff;
+
+    --p8:
+        #3d8bff;
+
+
+    /* ========================================================
+       MONTAGNE
+       ======================================================== */
+
+    --mountain-dark:
+        #11171c;
+
+    --mountain-mid:
+        #26323a;
+
+    --mountain-light:
+        #52626c;
+
+    --mountain-highlight:
+        #9aadb7;
+
+
+    /* ========================================================
+       GEOMETRIE DU PLATEAU
+       ======================================================== */
+
+    --board-size:
+        min(72vh, 72vw);
+
+    /*
+     * Une cellule est un octogone régulier approximatif.
+     *
+     * Pour que deux octogones soient réellement jointifs :
+     *
+     *     largeur cellule = largeur du pas
+     *
+     * On utilise ici un pas correspondant à la géométrie
+     * d'une grille orthogonale.
+     */
+
+    --grid-step:
+        calc(var(--board-size) / 15);
+
+    --tile-size:
+        var(--grid-step);
+
+
+    /* ========================================================
+       INTERFACE
+       ======================================================== */
+
+    --menu-width:
+        150px;
+
+    --menu-height:
+        44px;
+
+}
+
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+* {
+
+    box-sizing:
+        border-box;
+
+}
+
+
+html,
+body {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    margin:
+        0;
+
+    padding:
+        0;
+
+}
+
+
+body {
+
+    overflow:
+        hidden;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            #12202a 0%,
+            #091219 42%,
+            #05080c 82%
+        );
+
+    color:
+        var(--text);
+
+    font-family:
+        "Courier New",
+        monospace;
+
+}
+
+
+/* ============================================================
+   GAME
+   ============================================================ */
+
+.game {
+
+    position:
+        relative;
+
+    width:
+        100vw;
+
+    height:
+        100vh;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.game-header {
+
+    position:
+        absolute;
+
+    top:
+        clamp(
+            52px,
+            8vh,
+            82px
+        );
+
+    left:
+        50%;
+
+    width:
+        min(
+            760px,
+            68vw
+        );
+
+    transform:
+        translateX(-50%);
+
+    display:
+        flex;
+
+    align-items:
+        flex-end;
+
+    justify-content:
+        space-between;
+
+    z-index:
+        1000;
+
+    pointer-events:
+        none;
+
+}
+
+
+.sector {
+
+    color:
+        var(--p1);
+
+    font-size:
+        8px;
+
+    letter-spacing:
+        0.3em;
+
+}
+
+
+h1 {
+
+    margin:
+        5px 0 0;
+
+    color:
+        var(--text);
+
+    font-size:
+        clamp(
+            20px,
+            2.5vw,
+            28px
+        );
+
+    font-weight:
+        normal;
+
+    letter-spacing:
+        0.15em;
+
+}
+
+
+h1 span {
+
+    color:
+        var(--p1);
+
+}
+
+
+.coordinates {
+
+    color:
+        var(--muted);
+
+    font-size:
+        9px;
+
+    letter-spacing:
+        0.12em;
+
+}
+
+
+/* ============================================================
+   BOARD CONTAINER
+   ============================================================ */
+
+.board-container {
+
+    position:
+        relative;
+
+    width:
+        100vw;
+
+    height:
+        100vh;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    overflow:
+        hidden;
+
+}
+
+
+/* ============================================================
+   BOARD
+   ============================================================ */
+
+.board {
+
+    position:
+        relative;
+
+    width:
+        var(--board-size);
+
+    height:
+        var(--board-size);
+
+    flex:
+        0 0 var(--board-size);
+
+    display:
+        block;
+
+    border-radius:
+        50%;
+
+    overflow:
+        visible;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            #17252e 0%,
+            #0d171e 42%,
+            #081117 72%,
+            #050b10 100%
+        );
+
+    border:
+        1px solid
+        #334750;
+
+    box-shadow:
+
+        0 0 0 1px
+        rgba(
+            255,
+            255,
+            255,
+            0.025
+        ),
+
+        0 0 35px
+        rgba(
+            0,
+            0,
+            0,
+            0.8
+        ),
+
+        inset 0 0 55px
+        rgba(
+            0,
+            229,
+            255,
+            0.035
+        );
+
+    cursor:
+        grab;
+
+    touch-action:
+        none;
+
+    user-select:
+        none;
+
+    transform:
+        rotate(
+            var(--board-rotation, 0deg)
+        );
+
+    transform-origin:
+        center center;
+
+    transition:
+        box-shadow
+        0.2s ease;
+
+}
+
+
+/* ============================================================
+   ROTATION
+   ============================================================ */
+
+.board.is-rotating {
+
+    cursor:
+        grabbing;
+
+    transition:
+        none;
+
+    box-shadow:
+
+        0 0 0 1px
+        rgba(
+            255,
+            255,
+            255,
+            0.04
+        ),
+
+        0 0 45px
+        rgba(
+            0,
+            229,
+            255,
+            0.08
+        ),
+
+        inset 0 0 55px
+        rgba(
+            0,
+            229,
+            255,
+            0.04
+        );
+
+}
+
+
+/* ============================================================
+   CERCLES DE REFERENCE
+   ============================================================ */
+
+.board::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        4%;
+
+    border-radius:
+        50%;
+
+    border:
+        1px solid
+        rgba(
+            0,
+            229,
+            255,
+            0.08
+        );
+
+    box-shadow:
+
+        0 0 0 12%
+        rgba(
+            0,
+            229,
+            255,
+            0.025
+        ),
+
+        0 0 0 24%
+        rgba(
+            0,
+            229,
+            255,
+            0.025
+        ),
+
+        0 0 0 36%
+        rgba(
+            0,
+            229,
+            255,
+            0.025
+        );
+
+    pointer-events:
+        none;
+
+    z-index:
+        1;
+
+}
+
+
+/* ============================================================
+   8 SECTEURS RADIAUX
+   ============================================================ */
+
+.board::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    border-radius:
+        50%;
+
+    background:
+
+        repeating-conic-gradient(
+            from -22.5deg,
+
+            rgba(
+                255,
+                255,
+                255,
+                0.16
+            )
+
+            0deg
+            0.45deg,
+
+            transparent
+            0.45deg
+            45deg
+        );
+
+    pointer-events:
+        none;
+
+    z-index:
+        40;
+
+}
+
+
+/* ============================================================
+   CELLULE OCTOGONALE
+   ============================================================ */
+
+.tile {
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    width:
+        var(--tile-size);
+
+    height:
+        var(--tile-size);
+
+    margin:
+        calc(
+            var(--tile-size) / -2
+        );
+
+    /*
+     * IMPORTANT
+     *
+     * Les cases sont positionnées avec exactement le même
+     * pas que leur largeur.
+     *
+     * Elles ne sont donc plus espacées artificiellement.
+     */
+
+    transform:
+
+        translate(
+            calc(
+                var(--x)
+                * var(--grid-step)
+            ),
+
+            calc(
+                var(--y)
+                * var(--grid-step)
+            )
+        );
+
+    background:
+        #18232a;
+
+    /*
+     * OCTOGONE
+     */
+
+    clip-path:
+
+        polygon(
+
+            29.289% 0%,
+
+            70.711% 0%,
+
+            100% 29.289%,
+
+            100% 70.711%,
+
+            70.711% 100%,
+
+            29.289% 100%,
+
+            0% 70.711%,
+
+            0% 29.289%
+
+        );
+
+    cursor:
+        pointer;
+
+    z-index:
+        5;
+
+    transition:
+
+        transform
+        0.12s ease,
+
+        background
+        0.12s ease,
+
+        filter
+        0.12s ease,
+
+        box-shadow
+        0.12s ease;
+
+}
+
+
+/* ============================================================
+   JOINT ENTRE OCTOGONES
+   ============================================================ */
+
+/*
+ * Aucun margin / gap supplémentaire.
+ *
+ * Le contour sombre est interne à la cellule et non un espace
+ * entre les cellules.
+ */
+
+.tile::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        1px;
+
+    background:
+        #0c151b;
+
+    clip-path:
+        inherit;
+
+    pointer-events:
+        none;
+
+}
+
+
+.tile::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        3px;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.045
+        );
+
+    clip-path:
+        inherit;
+
+    pointer-events:
+        none;
+
+}
+
+
+/* ============================================================
+   COULEURS JOUEURS
+   ============================================================ */
+
+.player-1 {
+
+    --player-color:
+        var(--p1);
+
+}
+
+
+.player-2 {
+
+    --player-color:
+        var(--p2);
+
+}
+
+
+.player-3 {
+
+    --player-color:
+        var(--p3);
+
+}
+
+
+.player-4 {
+
+    --player-color:
+        var(--p4);
+
+}
+
+
+.player-5 {
+
+    --player-color:
+        var(--p5);
+
+}
+
+
+.player-6 {
+
+    --player-color:
+        var(--p6);
+
+}
+
+
+.player-7 {
+
+    --player-color:
+        var(--p7);
+
+}
+
+
+.player-8 {
+
+    --player-color:
+        var(--p8);
+
+}
+
+
+/* ============================================================
+   TERRITOIRES
+   ============================================================ */
+
+.tile.player-1,
+.tile.player-2,
+.tile.player-3,
+.tile.player-4,
+.tile.player-5,
+.tile.player-6,
+.tile.player-7,
+.tile.player-8 {
+
+    background:
+
+        color-mix(
+            in srgb,
+            var(--player-color)
+            22%,
+            #111a20
+        );
+
+}
+
+
+.tile.player-1::before {
+
+    background:
+        rgba(
+            0,
+            229,
+            255,
+            0.10
+        );
+
+}
+
+
+.tile.player-2::before {
+
+    background:
+        rgba(
+            0,
+            255,
+            153,
+            0.10
+        );
+
+}
+
+
+.tile.player-3::before {
+
+    background:
+        rgba(
+            255,
+            230,
+            0,
+            0.10
+        );
+
+}
+
+
+.tile.player-4::before {
+
+    background:
+        rgba(
+            255,
+            64,
+            87,
+            0.10
+        );
+
+}
+
+
+.tile.player-5::before {
+
+    background:
+        rgba(
+            255,
+            138,
+            0,
+            0.10
+        );
+
+}
+
+
+.tile.player-6::before {
+
+    background:
+        rgba(
+            255,
+            59,
+            212,
+            0.10
+        );
+
+}
+
+
+.tile.player-7::before {
+
+    background:
+        rgba(
+            168,
+            85,
+            255,
+            0.10
+        );
+
+}
+
+
+.tile.player-8::before {
+
+    background:
+        rgba(
+            61,
+            139,
+            255,
+            0.10
+        );
+
+}
+
+
+/* ============================================================
+   NUMERO DU JOUEUR
+   ============================================================ */
+
+.tile-number {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--player-color);
+
+    font-size:
+        8px;
+
+    font-weight:
+        bold;
+
+    text-shadow:
+
+        0 0 6px
+        var(--player-color);
+
+    z-index:
+        10;
+
+    pointer-events:
+        none;
+
+}
+
+
+/* ============================================================
+   HOVER
+   ============================================================ */
+
+.tile.player-1:hover,
+.tile.player-2:hover,
+.tile.player-3:hover,
+.tile.player-4:hover,
+.tile.player-5:hover,
+.tile.player-6:hover,
+.tile.player-7:hover,
+.tile.player-8:hover {
+
+    transform:
+
+        translate(
+            calc(
+                var(--x)
+                * var(--grid-step)
+            ),
+
+            calc(
+                var(--y)
+                * var(--grid-step)
+            )
+        )
+
+        scale(
+            1.06
+        );
+
+    background:
+        var(--player-color);
+
+    filter:
+
+        brightness(
+            1.18
+        )
+
+        saturate(
+            1.3
+        )
+
+        drop-shadow(
+            0 0 7px
+            var(--player-color)
+        );
+
+    z-index:
+        80;
+
+}
+
+
+.tile.player-1:hover::before,
+.tile.player-2:hover::before,
+.tile.player-3:hover::before,
+.tile.player-4:hover::before,
+.tile.player-5:hover::before,
+.tile.player-6:hover::before,
+.tile.player-7:hover::before,
+.tile.player-8:hover::before {
+
+    background:
+
+        rgba(
+            5,
+            10,
+            14,
+            0.18
+        );
+
+}
+
+
+/* ============================================================
+   SELECTION
+   ============================================================ */
+
+.tile.selected {
+
+    transform:
+
+        translate(
+            calc(
+                var(--x)
+                * var(--grid-step)
+            ),
+
+            calc(
+                var(--y)
+                * var(--grid-step)
+            )
+        )
+
+        scale(
+            1.10
+        );
+
+    background:
+        var(--player-color);
+
+    filter:
+
+        brightness(
+            1.5
+        )
+
+        saturate(
+            1.5
+        )
+
+        drop-shadow(
+            0 0 10px
+            var(--player-color)
+        )
+
+        drop-shadow(
+            0 0 22px
+            var(--player-color)
+        );
+
+    box-shadow:
+
+        inset
+        0 0 0 2px
+        rgba(
+            255,
+            255,
+            255,
+            0.95
+        ),
+
+        0 0 15px
+        var(--player-color);
+
+    z-index:
+        100;
+
+}
+
+
+.tile.selected::before {
+
+    background:
+
+        rgba(
+            255,
+            255,
+            255,
+            0.13
+        );
+
+}
+
+
+.tile.selected::after {
+
+    inset:
+        3px;
+
+    border:
+
+        2px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.88
+        );
+
+}
+
+
+/* ============================================================
+   MONTAGNE CENTRALE 3 x 3
+   ============================================================ */
+
+.tile.mountain-tile {
+
+    --player-color:
+        var(--mountain-highlight);
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #52626c,
+            #26323a
+        );
+
+    z-index:
+        30;
+
+}
+
+
+.tile.mountain-tile::before {
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #3d4b54,
+            #151c21
+        );
+
+}
+
+
+.tile.mountain-tile::after {
+
+    inset:
+        3px;
+
+    border:
+
+        1px solid
+        rgba(
+            180,
+            198,
+            207,
+            0.20
+        );
+
+}
+
+
+/* ============================================================
+   RELIEF MONTAGNE
+   ============================================================ */
+
+.tile.mountain-mark {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+
+        rgba(
+            190,
+            207,
+            215,
+            0.62
+        );
+
+    font-size:
+        8px;
+
+    text-shadow:
+
+        0 2px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.9
+        );
+
+    z-index:
+        10;
+
+    pointer-events:
+        none;
+
+}
+
+
+.tile.mountain-tile:hover {
+
+    transform:
+
+        translate(
+            calc(
+                var(--x)
+                * var(--grid-step)
+            ),
+
+            calc(
+                var(--y)
+                * var(--grid-step)
+            )
+        )
+
+        scale(
+            1.05
+        );
+
+    background:
+
+        linear-gradient(
+            145deg,
+            #70838d,
+            #35434b
+        );
+
+    filter:
+
+        brightness(
+            1.12
+        )
+
+        drop-shadow(
+            0 0 8px
+            rgba(
+                160,
+                180,
+                190,
+                0.4
+            )
+        );
+
+    z-index:
+        90;
+
+}
+
+
+/* ============================================================
+   CENTRE MONTAGNE
+   ============================================================ */
+
+.tile.mountain-center {
+
+    background:
+
+        radial-gradient(
+            circle at 35% 30%,
+            #718590,
+            #34434b 52%,
+            #182126 100%
+        );
+
+    box-shadow:
+
+        inset
+        0 0 0 2px
+        rgba(
+            190,
+            210,
+            218,
+            0.35
+        );
+
+}
+
+
+/* ============================================================
+   OBSTACLES
+   ============================================================ */
+
+.tile.obstacle {
+
+    filter:
+        saturate(
+            0.45
+        );
+
+}
+
+
+.obstacle-mark {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.45
+        );
+
+    font-size:
+        15px;
+
+    font-weight:
+        bold;
+
+    text-shadow:
+
+        0 0 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.9
+        );
+
+    z-index:
+        15;
+
+    pointer-events:
+        none;
+
+}
+
+
+/* ============================================================
+   MENUS
+   ============================================================ */
+
+.edge-menu {
+
+    position:
+        fixed;
+
+    z-index:
+        2000;
+
+    background:
+
+        rgba(
+            5,
+            10,
+            14,
+            0.94
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    backdrop-filter:
+        blur(
+            8px
+        );
+
+}
+
+
+.menu-top {
+
+    top:
+        0;
+
+    left:
+        0;
+
+    right:
+        0;
+
+    height:
+        var(--menu-height);
+
+    border-top:
+        none;
+
+    border-left:
+        none;
+
+    border-right:
+        none;
+
+}
+
+
+.menu-bottom {
+
+    bottom:
+        0;
+
+    left:
+        0;
+
+    right:
+        0;
+
+    height:
+        var(--menu-height);
+
+    border-bottom:
+        none;
+
+    border-left:
+        none;
+
+    border-right:
+        none;
+
+}
+
+
+.menu-left {
+
+    left:
+        0;
+
+    top:
+        50%;
+
+    width:
+        var(--menu-width);
+
+    transform:
+        translateY(-50%);
+
+    border-left:
+        none;
+
+}
+
+
+.menu-right {
+
+    right:
+        0;
+
+    top:
+        50%;
+
+    width:
+        var(--menu-width);
+
+    transform:
+        translateY(-50%);
+
+    border-right:
+        none;
+
+}
+
+
+/* ============================================================
+   MENU INTERNE
+   ============================================================ */
+
+.menu-inner {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    padding:
+        7px 12px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+}
+
+
+.menu-inner.vertical {
+
+    height:
+        auto;
+
+    padding:
+        14px 10px;
+
+    flex-direction:
+        column;
+
+    align-items:
+        stretch;
+
+}
+
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+
+.game-logo {
+
+    margin-right:
+        auto;
+
+    color:
+        var(--text);
+
+    font-size:
+        11px;
+
+    letter-spacing:
+        0.12em;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.game-logo span {
+
+    color:
+        var(--p1);
+
+}
+
+
+/* ============================================================
+   BOUTONS
+   ============================================================ */
+
+button {
+
+    appearance:
+        none;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        #0a1218;
+
+    color:
+        var(--muted);
+
+    padding:
+        7px 10px;
+
+    font-family:
+        inherit;
+
+    font-size:
+        8px;
+
+    letter-spacing:
+        0.08em;
+
+    cursor:
+        pointer;
+
+    transition:
+
+        color
+        0.15s ease,
+
+        border-color
+        0.15s ease,
+
+        background
+        0.15s ease,
+
+        box-shadow
+        0.15s ease;
+
+}
+
+
+button:hover {
+
+    color:
+        var(--text);
+
+    border-color:
+        var(--border-light);
+
+    background:
+        #101c24;
+
+}
+
+
+button.primary {
+
+    color:
+        var(--p1);
+
+    border-color:
+
+        color-mix(
+            in srgb,
+            var(--p1) 50%,
+            var(--border)
+        );
+
+}
+
+
+button.primary:hover {
+
+    color:
+        #ffffff;
+
+    background:
+        rgba(
+            0,
+            229,
+            255,
+            0.10
+        );
+
+    box-shadow:
+
+        0 0 12px
+        rgba(
+            0,
+            229,
+            255,
+            0.15
+        );
+
+}
+
+
+/* ============================================================
+   TITRES MENU
+   ============================================================ */
+
+.menu-title {
+
+    color:
+        var(--p1);
+
+    font-size:
+        8px;
+
+    letter-spacing:
+        0.25em;
+
+    margin-bottom:
+        5px;
+
+}
+
+
+/* ============================================================
+   JOUEUR
+   ============================================================ */
+
+.player {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    padding:
+        8px;
+
+    margin-bottom:
+        5px;
+
+    background:
+        #0c151b;
+
+    border:
+        1px solid
+        var(--border);
+
+}
+
+
+.player-avatar {
+
+    width:
+        28px;
+
+    height:
+        28px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border:
+        1px solid
+        var(--p1);
+
+    color:
+        var(--p1);
+
+    font-size:
+        9px;
+
+}
+
+
+.player-info {
+
+    min-width:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        3px;
+
+}
+
+
+.player-info strong {
+
+    color:
+        var(--text);
+
+    font-size:
+        8px;
+
+}
+
+
+.player-info span {
+
+    color:
+        var(--p2);
+
+    font-size:
+        7px;
+
+}
+
+
+/* ============================================================
+   STATUS BAS
+   ============================================================ */
+
+.game-status {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    margin-right:
+        auto;
+
+    color:
+        var(--muted);
+
+    font-size:
+        8px;
+
+}
+
+
+.status-light {
+
+    width:
+        6px;
+
+    height:
+        6px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--p2);
+
+    box-shadow:
+
+        0 0 8px
+        var(--p2);
+
+}
+
+
+.stat {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        8px;
+
+}
+
+
+.stat strong {
+
+    color:
+        var(--text);
+
+}
+
+
+.action-status {
+
+    min-width:
+        180px;
+
+    justify-content:
+        center;
+
+    color:
+        var(--p1);
+
+}
+
+
+/* ============================================================
+   HINT
+   ============================================================ */
+
+.hint {
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    bottom:
+        52px;
+
+    transform:
+        translateX(-50%);
+
+    z-index:
+        1000;
+
+    color:
+        var(--muted);
+
+    font-size:
+        7px;
+
+    letter-spacing:
+        0.08em;
+
+    white-space:
+        nowrap;
+
+    pointer-events:
+        none;
+
+}
+
+
+.hint span {
+
+    color:
+        var(--p1);
+
+}
+
+
+/* ============================================================
+   NOTIFICATION
+   ============================================================ */
+
+.notification {
+
+    position:
+        fixed;
+
+    left:
+        50%;
+
+    bottom:
+        72px;
+
+    transform:
+        translate(
+            -50%,
+            20px
+        );
+
+    padding:
+        8px 14px;
+
+    background:
+
+        rgba(
+            5,
+            10,
+            14,
+            0.96
+        );
+
+    border:
+        1px solid
+        var(--border-light);
+
+    color:
+        var(--text);
+
+    font-size:
+        8px;
+
+    letter-spacing:
+        0.08em;
+
+    opacity:
+        0;
+
+    pointer-events:
+        none;
+
+    z-index:
+        3000;
+
+    transition:
+
+        opacity
+        0.2s ease,
+
+        transform
+        0.2s ease;
+
+}
+
+
+.notification.show {
+
+    opacity:
+        1;
+
+    transform:
+        translate(
+            -50%,
+            0
+        );
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (
+    max-width: 900px
+) {
+
+    :root {
+
+        --board-size:
+            min(
+                68vh,
+                68vw
+            );
+
+        --menu-width:
+            125px;
+
+    }
+
+
+    .game-header {
+
+        width:
+            62vw;
+
+    }
+
+}
+
+
+@media (
+    max-width: 700px
+) {
+
+    :root {
+
+        --board-size:
+            min(
+                64vh,
+                76vw
+            );
+
+        --menu-width:
+            105px;
+
+    }
+
+
+    .game-header {
+
+        width:
+            58vw;
+
+        top:
+            52px;
+
+    }
+
+
+    .menu-inner {
+
+        gap:
+            4px;
+
+    }
+
+
+    .menu-inner > button {
+
+        padding:
+            6px;
+
+        font-size:
+            7px;
+
+    }
+
+
+    .game-logo {
+
+        font-size:
+            8px;
+
+    }
+
+
+    .menu-left,
+    .menu-right {
+
+        width:
+            var(--menu-width);
+
+    }
+
+
+    .action-status {
+
+        min-width:
+            100px;
+
+    }
+
+}
+
+
+@media (
+    max-width: 520px
+) {
+
+    :root {
+
+        --board-size:
+            min(
+                58vh,
+                82vw
+            );
+
+        --menu-width:
+            88px;
+
+    }
+
+
+    .game-header {
+
+        width:
+            54vw;
+
+    }
+
+
+    .game-header h1 {
+
+        font-size:
+            16px;
+
+    }
+
+
+    .coordinates {
+
+        font-size:
+            7px;
+
+    }
+
+
+    .menu-top button,
+    .menu-bottom button {
+
+        font-size:
+            6px;
+
+        padding:
+            5px 6px;
+
+    }
+
+
+    .menu-left,
+    .menu-right {
+
+        opacity:
+            0.92;
+
+    }
+
+
+    .hint {
+
+        bottom:
+            48px;
+
+        font-size:
+            6px;
+
+    }
+
+}
